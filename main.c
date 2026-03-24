@@ -1,19 +1,20 @@
+#define _GNU_SOURCE
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 // Size of shared mem region created by AMS2
-const size_t REGION_SIZE = 0x6000;
+const off_t REGION_SIZE = 0x6000;
 
 // Scan /proc/.../maps, and find virtual address in AMS2 space that hold telemetry shared mem
-off_t get_telemetry_sharedmem_address(char* pid) {
+off_t get_telemetry_sharedmem_address(pid_t pid) {
     char maps_path[256];
-    snprintf(maps_path, sizeof(maps_path), "/proc/%s/maps", pid);
+    snprintf(maps_path, sizeof(maps_path), "/proc/%d/maps", pid);
 
     FILE *fp = fopen(maps_path, "r");
     if (!fp) {
@@ -44,26 +45,23 @@ off_t get_telemetry_sharedmem_address(char* pid) {
     exit(1);
 }
 
-// Map address from another process
-void* map_proc_address(char* pid, off_t offset) {
-    char mem_path[256];
-    snprintf(mem_path, sizeof(mem_path), "/proc/%s/mem", pid);
+// Read memory from another process
+void read_proc_memory(pid_t pid, off_t remote_addr, void *local_buf, size_t size) {
+    struct iovec local_iov = {
+        .iov_base = local_buf,
+        .iov_len = size,
+    };
 
-    int mem_fd = open(mem_path, O_RDONLY);
-    if (mem_fd < 0) {
-        perror("Failed to open AMS2's mem. Make sure ams2-linux-haptics is run with elevated permissions");
+    struct iovec remote_iov = {
+        .iov_base = (void *)remote_addr,
+        .iov_len = size,
+    };
+
+    ssize_t nread = process_vm_readv(pid, &local_iov, 1, &remote_iov, 1, 0);
+    if (nread < 0) {
+        perror("process_vm_readv");
         exit(1);
     }
-
-    void *mapped = mmap(NULL, REGION_SIZE, PROT_READ, MAP_PRIVATE, mem_fd, offset);
-    if (mapped == MAP_FAILED) {
-        perror("mmap");
-        close(mem_fd);
-        exit(1);
-    }
-
-    close(mem_fd);
-    return mapped;
 }
 
 int main(int argc, char **argv) {
@@ -72,18 +70,19 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    off_t region_start = get_telemetry_sharedmem_address(argv[1]);
-    void* data = map_proc_address(argv[1], region_start);
+    pid_t pid = (pid_t)atoi(argv[1]);
+    off_t region_start = get_telemetry_sharedmem_address(pid);
 
-    printf("Mapped region at %p\n", data);
+    uint8_t data[REGION_SIZE];
+    read_proc_memory(pid, region_start, data, REGION_SIZE);
+
+    printf("Read %zu bytes from remote process\n", REGION_SIZE);
     printf("First 128 bytes: ");
     for (int i = 0; i < 128; i++) {
-        uint8_t v = ((uint8_t *)data)[i];
-        printf("%02x %c", v, isalnum(v) ? v : ' ');
+        uint8_t v = data[i];
+        printf("%02x %c", v, isalnum(v) ? v : '.');
     }
     printf("\n");
-
-    munmap(data, REGION_SIZE);
 
     return 0;
 }
