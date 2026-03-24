@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     printf("First 128 bytes: ");
     for (int i = 0; i < 128; i++) {
         uint8_t v = data[i];
-        printf("%02x %c", v, isalnum(v) ? v : '.');
+        printf("%d:\t%02x %c\n", i, v, isalnum(v) ? v : '.');
     }
     printf("\n");
 
