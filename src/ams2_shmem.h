@@ -2,6 +2,7 @@
 // Based on
 // https://github.com/RangeyRover/Automobilista-2-Auto-Director/blob/main/shared_memory_struct.py and
 // https://codedocs.xyz/Spacefreak18/simapi/pcars2data_8h_source.html
+#include <stdbool.h>
 #include <stdint.h>
 
 #define SHARED_MEMORY_VERSION 14
@@ -28,7 +29,7 @@ enum {
   VEC_MAX
 };
 
-enum GameState : uint32_t {
+typedef enum : int32_t {
   GAME_EXITED = 0,
   GAME_FRONT_END,
   GAME_INGAME_PLAYING,
@@ -39,9 +40,9 @@ enum GameState : uint32_t {
   GAME_FRONT_END_REPLAY,
   //-------------
   GAME_MAX
-};
+} GameState;
 
-enum SessionState : uint32_t {
+typedef enum : int32_t {
   SESSION_INVALID = 0,
   SESSION_PRACTICE,
   SESSION_TEST,
@@ -51,9 +52,9 @@ enum SessionState : uint32_t {
   SESSION_TIME_ATTACK,
   //-------------
   SESSION_MAX
-};
+} SessionState;
 
-enum RaceState : uint32_t {
+typedef enum : int32_t {
   RACESTATE_INVALID,
   RACESTATE_NOT_STARTED,
   RACESTATE_RACING,
@@ -63,9 +64,9 @@ enum RaceState : uint32_t {
   RACESTATE_DNF,
   //-------------
   RACESTATE_MAX
-};
+} RaceState;
 
-enum FlagColour : uint32_t {
+typedef enum : int32_t {
   FLAG_COLOUR_NONE = 0,            // Not used for actual flags, only for some query functions
   FLAG_COLOUR_GREEN,               // End of danger zone, or race started
   FLAG_COLOUR_BLUE,                // Faster car wants to overtake the participant
@@ -80,18 +81,18 @@ enum FlagColour : uint32_t {
   FLAG_COLOUR_CHEQUERED,           // Chequered flag
   //-------------
   FLAG_COLOUR_MAX
-};
+} FlagColour;
 
-enum FlagReason : uint32_t {
+typedef enum : int32_t {
   FLAG_REASON_NONE = 0,
   FLAG_REASON_SOLO_CRASH,
   FLAG_REASON_VEHICLE_CRASH,
   FLAG_REASON_VEHICLE_OBSTRUCTION,
   //-------------
   FLAG_REASON_MAX
-};
+} FlagReason;
 
-enum PitMode : uint32_t {
+typedef enum : int32_t {
   PIT_MODE_NONE = 0,
   PIT_MODE_DRIVING_INTO_PITS,
   PIT_MODE_IN_PIT,
@@ -100,9 +101,9 @@ enum PitMode : uint32_t {
   PIT_MODE_DRIVING_OUT_OF_GARAGE,
   //-------------
   PIT_MODE_MAX
-};
+} PitMode;
 
-enum PitSchedule : uint32_t {
+typedef enum : int32_t {
   PIT_SCHEDULE_NONE = 0,           // Nothing scheduled
   PIT_SCHEDULE_PLAYER_REQUESTED,   // Used for standard pit sequence - requested by player
   PIT_SCHEDULE_ENGINEER_REQUESTED, // Used for standard pit sequence - requested by engineer
@@ -113,9 +114,9 @@ enum PitSchedule : uint32_t {
   PIT_SCHEDULE_PITSPOT_OCCUPIED, // Used for drive-through when pitspot is occupied
   //-------------
   PIT_SCHEDULE_MAX
-};
+} PitSchedule;
 
-enum CarFlags : uint32_t {
+typedef enum : int32_t {
   CAR_HEADLIGHT = (1 << 0),
   CAR_ENGINE_ACTIVE = (1 << 1),
   CAR_ENGINE_WARNING = (1 << 2),
@@ -124,15 +125,15 @@ enum CarFlags : uint32_t {
   CAR_HANDBRAKE = (1 << 5),
   CAR_TCS = (1 << 6),
   CAR_SCS = (1 << 7),
-};
+} CarFlags;
 
-enum TyreFlags : uint32_t {
+typedef enum : int32_t {
   TYRE_ATTACHED = (1 << 0),
   TYRE_INFLATED = (1 << 1),
   TYRE_IS_ON_GROUND = (1 << 2),
-};
+} TyreFlags;
 
-enum Terrain : uint32_t {
+typedef enum : int32_t {
   TERRAIN_ROAD = 0,
   TERRAIN_LOW_GRIP_ROAD,
   TERRAIN_BUMPY_ROAD1,
@@ -186,9 +187,9 @@ enum Terrain : uint32_t {
   TERRAIN_RALLY_TARMAC,
   //-------------
   TERRAIN_MAX
-};
+} Terrain;
 
-enum CrashDamage : uint32_t {
+typedef enum : int32_t {
   CRASH_DAMAGE_NONE = 0,
   CRASH_DAMAGE_OFFTRACK,
   CRASH_DAMAGE_LARGE_PROP,
@@ -196,7 +197,7 @@ enum CrashDamage : uint32_t {
   CRASH_DAMAGE_ROLLING,
   //-------------
   CRASH_MAX
-};
+} CrashDamage;
 
 typedef struct {
   bool mIsActive;
@@ -209,24 +210,24 @@ typedef struct {
   int mCurrentSector;            // [ RANGE = 0->... ] [ UNSET = -1 ]
 } ParticipantInfo;
 
-enum DrsState : uint32_t {
+typedef enum : int32_t {
   DRS_INSTALLED = (1 << 0),      // Vehicle has DRS capability
   DRS_ZONE_RULES = (1 << 1),     // 1 if DRS uses F1 style rules
   DRS_AVAILABLE_NEXT = (1 << 2), // detection zone was triggered (only applies to f1 style rules)
   DRS_AVAILABLE_NOW = (1 << 3),  // detection zone triggered and we are in the zone (only applies to f1 style rules)
   DRS_ACTIVE = (1 << 4),         // Wing is in activated state
-};
+} DrsState;
 
-enum ErsDeploymentMode : int32_t {
+typedef enum : int32_t {
   ERS_DEPLOYMENT_MODE_NONE = 0, // The vehicle does not support deployment modes
   ERS_DEPLOYMENT_MODE_OFF,      // Regen only, no deployment
   ERS_DEPLOYMENT_MODE_BUILD,    // Heavy emphasis towards regen
   ERS_DEPLOYMENT_MODE_BALANCED, // Deployment map automatically adjusted to try and maintain target SoC
   ERS_DEPLOYMENT_MODE_ATTACK,   // More aggressive deployment, no target SoC
   ERS_DEPLOYMENT_MODE_QUAL,     // Maximum deployment, no target Soc
-};
+} ErsDeploymentMode;
 
-enum YellowFlagState : int32_t {
+typedef enum : int32_t {
   YFS_INVALID = -1,
   YFS_NONE,         // No yellow flag pending on track
   YFS_PENDING,      // Flag has been thrown, but not yet taken by leader
@@ -239,14 +240,14 @@ enum YellowFlagState : int32_t {
   YFS_RACE_HALT,    // Safety car will lead field into pits
   //-------------
   YFS_MAXIMUM,
-};
+} YellowFlagState;
 
-enum LaunchStage : int32_t {
+typedef enum : int32_t {
   LAUNCH_INVALID = -1, // Launch control unavailable
   LAUNCH_OFF = 0,      // Launch control inactive
   LAUNCH_REV,          // Launch control revving to optimum engine speed
   LAUNCH_ON,           // Launch control actively accelerating vehicle
-};
+} LaunchStage;
 
 typedef struct __attribute__((packed)) {
   // Version Number
@@ -254,9 +255,9 @@ typedef struct __attribute__((packed)) {
   unsigned int mBuildVersionNumber; // [ RANGE = 0->... ] [ UNSET = 0 ]
 
   // Game States
-  enum GameState mGameState;
-  enum SessionState mSessionState;
-  enum RaceState mRaceState;
+  GameState mGameState;
+  SessionState mSessionState;
+  RaceState mRaceState;
 
   // Participant Info
   int mViewedParticipantIndex; // [ RANGE = 0->STORED_PARTICIPANTS_MAX ] [ UNSET = -1 ]
@@ -305,15 +306,15 @@ typedef struct __attribute__((packed)) {
   float mWorldFastestSector3Time;    // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
 
   // Flags
-  enum FlagColour mHighestFlagColour;
-  enum FlagReason mHighestFlagReason;
+  FlagColour mHighestFlagColour;
+  FlagReason mHighestFlagReason;
 
   // Pit Info
-  enum PitMode mPitMode;
-  enum PitSchedule mPitSchedule;
+  PitMode mPitMode;
+  PitSchedule mPitSchedule;
 
   // Car State
-  enum CarFlags mCarFlags;
+  CarFlags mCarFlags;
   float mOilTempCelsius;                 // [ UNITS = Celsius ] [ UNSET = 0 ]
   float mOilPressureKPa;                 // [ UNITS = Kilopascal ] [ RANGE = 0->... ] [ UNSET = 0 ]
   float mWaterTempCelsius;               // [ UNITS = Celsius ] [ UNSET = 0 ]
@@ -347,8 +348,8 @@ typedef struct __attribute__((packed)) {
   float mExtentsCentre[VEC_MAX];     // [ UNITS = Local Space  X  Y  Z ]
 
   // Wheels / Tyres
-  enum TyreFlags mTyreFlags[TYRE_MAX];
-  enum Terrain mTyreTerrain[TYRE_MAX];
+  TyreFlags mTyreFlags[TYRE_MAX];
+  Terrain mTyreTerrain[TYRE_MAX];
   float mTyreY[TYRE_MAX];                 // [ UNITS = Local Space  Y ]
   float mTyreRPS[TYRE_MAX];               // [ UNITS = Revolutions per second ]
   float mTyreSlipSpeed[TYRE_MAX];         // OBSOLETE, kept for backward compatibility only
@@ -367,7 +368,7 @@ typedef struct __attribute__((packed)) {
   float mTyreInternalAirTemp[TYRE_MAX];   // [ UNITS = Kelvin ]
 
   // Car Damage
-  enum CrashDamage mCrashState;
+  CrashDamage mCrashState;
   float mAeroDamage;   // [ RANGE = 0->1 ]
   float mEngineDamage; // [ RANGE = 0->1 ]
 
@@ -406,8 +407,8 @@ typedef struct __attribute__((packed)) {
   float mFastestLapTimes[STORED_PARTICIPANTS_MAX];     // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
   float mLastLapTimes[STORED_PARTICIPANTS_MAX];        // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
   bool mLapsInvalidated[STORED_PARTICIPANTS_MAX];      // [ UNITS = boolean per participant ] [ UNSET = false ]
-  enum RaceState mRaceStates[STORED_PARTICIPANTS_MAX];
-  enum PitMode mPitModes[STORED_PARTICIPANTS_MAX];
+  RaceState mRaceStates[STORED_PARTICIPANTS_MAX];
+  PitMode mPitModes[STORED_PARTICIPANTS_MAX];
   float mOrientations[STORED_PARTICIPANTS_MAX][VEC_MAX];           // [ UNITS = Euler Angles ]
   float mSpeeds[STORED_PARTICIPANTS_MAX];                          // [ UNITS = Metres per-second ] [ RANGE = 0->... ]
   char mCarNames[STORED_PARTICIPANTS_MAX][STRING_LENGTH_MAX];      // [ string ]
@@ -420,9 +421,9 @@ typedef struct __attribute__((packed)) {
   float mBrakeBias;                                            // [ RANGE = 0->1... ] [ UNSET = -1 ]
   float mTurboBoostPressure;                                   // [ RANGE = 0->1... ] [ UNSET = -1 ]
   char mTyreCompound[TYRE_MAX][TYRE_COMPOUND_NAME_LENGTH_MAX]; // [ strings  ]
-  enum PitSchedule mPitSchedules[STORED_PARTICIPANTS_MAX];
-  enum FlagColour mHighestFlagColours[STORED_PARTICIPANTS_MAX];
-  enum FlagReason mHighestFlagReasons[STORED_PARTICIPANTS_MAX];
+  PitSchedule mPitSchedules[STORED_PARTICIPANTS_MAX];
+  FlagColour mHighestFlagColours[STORED_PARTICIPANTS_MAX];
+  FlagReason mHighestFlagReasons[STORED_PARTICIPANTS_MAX];
   unsigned int mNationalities[STORED_PARTICIPANTS_MAX]; // [ nationality table, SP AND UNSET = 0 ]
   float mSnowDensity; // [ UNITS = How much snow will fall ] [ RANGE = 0->1 ] non zero only in Winter and Snow seasons
 
@@ -439,7 +440,7 @@ typedef struct __attribute__((packed)) {
   float mTyreTempRight[TYRE_MAX];  // [ UNITS = Celsius ] [ UNSET = 0 ]
 
   // DRS
-  enum DrsState mDrsState;
+  DrsState mDrsState;
 
   // Suspension
   float mRideHeight[TYRE_MAX]; // [ UNITS = cm ]
@@ -452,7 +453,7 @@ typedef struct __attribute__((packed)) {
   int mTractionControlSetting; // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
 
   // ERS
-  enum ErsDeploymentMode mErsDeploymentMode;
+  ErsDeploymentMode mErsDeploymentMode;
   bool mErsAutoModeEnabled; // true if deployment mode was selected by auto system. Valid only when mErsDeploymentMode >
                             // ERS_DEPLOYMENT_MODE_NONE
 
@@ -462,8 +463,11 @@ typedef struct __attribute__((packed)) {
   bool mClutchOverheated; // true if clutch performance is degraded due to overheating
   bool mClutchSlipping;   // true if clutch is slipping (can be induced by overheating or wear)
 
-  enum YellowFlagState mYellowFlagState;
+  YellowFlagState mYellowFlagState;
   bool mSessionIsPrivate; // true if this is a private session where users cannot see or interact with other drivers
                           // (and so would not need positional awareness of them etc)
-  enum LaunchStage mLaunchStage;
+  LaunchStage mLaunchStage;
 } ams2_shmem;
+
+// Debugging method
+void ams2_shmem_print(const ams2_shmem *data);

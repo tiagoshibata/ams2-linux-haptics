@@ -8,6 +8,8 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
+#include "ams2_shmem.h"
+
 // Size of shared mem region created by AMS2
 const off_t REGION_SIZE = 0x6000;
 
@@ -74,16 +76,11 @@ int main(int argc, char **argv) {
   pid_t pid = (pid_t)atoi(argv[1]);
   off_t region_start = get_telemetry_sharedmem_address(pid);
 
-  uint8_t data[REGION_SIZE];
-  read_proc_memory(pid, region_start, data, REGION_SIZE);
+  ams2_shmem data;
+  read_proc_memory(pid, region_start, &data, sizeof(data));
 
-  printf("Read %zu bytes from remote process\n", REGION_SIZE);
-  printf("First 128 bytes: ");
-  for (int i = 0; i < 128; i++) {
-    uint8_t v = data[i];
-    printf("%d:\t%02x %c\n", i, v, isalnum(v) ? v : '.');
-  }
-  printf("\n");
+  printf("Read %zu bytes from remote process\n", sizeof(data));
+  ams2_shmem_print(&data);
 
   return 0;
 }
