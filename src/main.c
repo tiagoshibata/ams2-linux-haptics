@@ -76,11 +76,12 @@ int main(int argc, char **argv) {
   pid_t pid = (pid_t)atoi(argv[1]);
   off_t region_start = get_telemetry_sharedmem_address(pid);
 
-  ams2_shmem data;
-  read_proc_memory(pid, region_start, &data, sizeof(data));
-
-  printf("Read %zu bytes from remote process\n", sizeof(data));
-  ams2_shmem_print(&data);
+  for (;;) {
+    ams2_shmem data;
+    read_proc_memory(pid, region_start, &data, sizeof(data));
+    ams2_shmem_print(&data);
+    sleep(1);
+  }
 
   return 0;
 }
