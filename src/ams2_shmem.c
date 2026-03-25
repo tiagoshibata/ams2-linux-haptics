@@ -1,6 +1,5 @@
 // This is opencode generated, and used only for debugging. I didn't check for correctness - it can have mistakes
 #include "ams2_shmem.h"
-#include <stdbool.h>
 #include <stdio.h>
 
 static const char *game_state_names[] = {
@@ -78,7 +77,7 @@ static const char *launch_stage_names[] = {
 };
 
 static void print_participant_info(const ParticipantInfo *info) {
-  printf("  mIsActive: %s\n", info->mIsActive ? "true" : "false");
+  printf("  mIsActive: %d\n", info->mIsActive);
   printf("  mName: %.64s\n", info->mName);
   printf("  mWorldPosition: [%.2f, %.2f, %.2f]\n", info->mWorldPosition[0], info->mWorldPosition[1],
          info->mWorldPosition[2]);
@@ -170,7 +169,7 @@ void ams2_shmem_print(const ams2_shmem *data) {
 
   printf("\nTimings:\n");
   printf("  mNumSectors: %d\n", data->mNumSectors);
-  printf("  mLapInvalidated: %s\n", data->mLapInvalidated ? "true" : "false");
+  printf("  mLapInvalidated: %d\n", data->mLapInvalidated );
   printf("  mBestLapTime: %.3f\n", data->mBestLapTime);
   printf("  mLastLapTime: %.3f\n", data->mLastLapTime);
   printf("  mCurrentTime: %.3f\n", data->mCurrentTime);
@@ -195,7 +194,9 @@ void ams2_shmem_print(const ams2_shmem *data) {
 
   printf("\nFlags:\n");
   printf("  mHighestFlagColour: %d (%s)\n", data->mHighestFlagColour,
-         data->mHighestFlagColour >= 0 && data->mHighestFlagColour < FLAG_COLOUR_MAX ? flag_colour_names[data->mHighestFlagColour] : "UNKNOWN");
+         data->mHighestFlagColour >= 0 && data->mHighestFlagColour < FLAG_COLOUR_MAX
+             ? flag_colour_names[data->mHighestFlagColour]
+             : "UNKNOWN");
   printf("  mHighestFlagReason: %d\n", data->mHighestFlagReason);
 
   printf("\nPit Info:\n");
@@ -223,10 +224,10 @@ void ams2_shmem_print(const ams2_shmem *data) {
   printf("  mGear: %d\n", data->mGear);
   printf("  mNumGears: %d\n", data->mNumGears);
   printf("  mOdometerKM: %.2f\n", data->mOdometerKM);
-  printf("  mAntiLockActive: %s\n", data->mAntiLockActive ? "true" : "false");
+  printf("  mAntiLockActive: %d\n", data->mAntiLockActive);
   printf("  mLastOpponentCollisionIndex: %d\n", data->mLastOpponentCollisionIndex);
   printf("  mLastOpponentCollisionMagnitude: %.2f\n", data->mLastOpponentCollisionMagnitude);
-  printf("  mBoostActive: %s\n", data->mBoostActive ? "true" : "false");
+  printf("  mBoostActive: %d\n", data->mBoostActive);
   printf("  mBoostAmount: %.2f\n", data->mBoostAmount);
 
   printf("\nMotion:\n");
@@ -313,19 +314,19 @@ void ams2_shmem_print(const ams2_shmem *data) {
   printf("\nERS:\n");
   printf("  mErsDeploymentMode: %d (%s)\n", data->mErsDeploymentMode,
          ers_deployment_names[data->mErsDeploymentMode] ? ers_deployment_names[data->mErsDeploymentMode] : "UNKNOWN");
-  printf("  mErsAutoModeEnabled: %s\n", data->mErsAutoModeEnabled ? "true" : "false");
+  printf("  mErsAutoModeEnabled: %d\n", data->mErsAutoModeEnabled);
 
   printf("\nClutch:\n");
   printf("  mClutchTemp: %.2f K\n", data->mClutchTemp);
   printf("  mClutchWear: %.2f\n", data->mClutchWear);
-  printf("  mClutchOverheated: %s\n", data->mClutchOverheated ? "true" : "false");
-  printf("  mClutchSlipping: %s\n", data->mClutchSlipping ? "true" : "false");
+  printf("  mClutchOverheated: %d\n", data->mClutchOverheated);
+  printf("  mClutchSlipping: %d\n", data->mClutchSlipping);
 
   printf("\nSession:\n");
   printf("  mYellowFlagState: %d (%s)\n", data->mYellowFlagState,
          yellow_flag_state_names[data->mYellowFlagState + 1] ? yellow_flag_state_names[data->mYellowFlagState + 1]
                                                              : "UNKNOWN");
-  printf("  mSessionIsPrivate: %s\n", data->mSessionIsPrivate ? "true" : "false");
+  printf("  mSessionIsPrivate: %d\n", data->mSessionIsPrivate);
   printf("  mLaunchStage: %d (%s)\n", data->mLaunchStage,
          launch_stage_names[data->mLaunchStage + 1] ? launch_stage_names[data->mLaunchStage + 1] : "UNKNOWN");
 }

@@ -2,7 +2,6 @@
 // Based on
 // https://github.com/RangeyRover/Automobilista-2-Auto-Director/blob/main/shared_memory_struct.py and
 // https://codedocs.xyz/Spacefreak18/simapi/pcars2data_8h_source.html
-#include <stdbool.h>
 #include <stdint.h>
 
 #define SHARED_MEMORY_VERSION 14
