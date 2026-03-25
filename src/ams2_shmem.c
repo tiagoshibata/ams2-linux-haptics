@@ -146,8 +146,7 @@ void ams2_shmem_print(const ams2_shmem *data) {
          data->mUnfilteredBrake, data->mUnfilteredSteering, data->mUnfilteredClutch);
 
   printf("\nCar Name: %.64s (class: %.64s)\n", data->mCarName, data->mCarClassName);
-  printf("Track: %.64s Variation: %.64s (%.2fkm) LapsInEvent: %u\n", data->mTrackLocation, data->mTrackVariation,
-         data->mTrackLength, data->mLapsInEvent);
+  printf("Track: %.64s Variation: %.64s (%.2fkm) LapsInEvent: %u\n", data->mTrackLocation, data->mTrackVariation, data->mTrackLength, data->mLapsInEvent);
 
   printf("\nTimings:\n");
   printf("  NumSectors: %d\n", data->mNumSectors);
@@ -189,8 +188,7 @@ void ams2_shmem_print(const ams2_shmem *data) {
   printf("  Gear: %d/%d\n", data->mGear, data->mNumGears);
   printf("  OdometerKM: %.2f\n", data->mOdometerKM);
   printf("  AntiLockActive: %d\n", data->mAntiLockActive);
-  printf("  LastOpponentCollisionIndex: %d Magnitude: %.2f\n", data->mLastOpponentCollisionIndex,
-         data->mLastOpponentCollisionMagnitude);
+  printf("  LastOpponentCollisionIndex: %d Magnitude: %.2f\n", data->mLastOpponentCollisionIndex, data->mLastOpponentCollisionMagnitude);
   printf("  Boost: Active: %d Amount: %.2f\n", data->mBoostActive, data->mBoostAmount);
 
   printf("\nMotion:\n");
