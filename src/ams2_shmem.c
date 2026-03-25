@@ -3,9 +3,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
-
 static const char *game_state_names[] = {
     "GAME_EXITED",
     "GAME_FRONT_END",
@@ -133,7 +130,7 @@ static void print_terrain_array(const char *name, const Terrain *arr) {
 }
 
 void ams2_shmem_print(const ams2_shmem *data) {
-  printf("=== Shared Memory Data ===\n\n");
+  printf("===== Shared Memory Data =====\n\n");
 
   printf("Version:\n");
   printf("  mVersion: %u\n", data->mVersion);
@@ -198,7 +195,7 @@ void ams2_shmem_print(const ams2_shmem *data) {
 
   printf("\nFlags:\n");
   printf("  mHighestFlagColour: %d (%s)\n", data->mHighestFlagColour,
-         flag_colour_names[data->mHighestFlagColour] ? flag_colour_names[data->mHighestFlagColour] : "UNKNOWN");
+         data->mHighestFlagColour >= 0 && data->mHighestFlagColour < FLAG_COLOUR_MAX ? flag_colour_names[data->mHighestFlagColour] : "UNKNOWN");
   printf("  mHighestFlagReason: %d\n", data->mHighestFlagReason);
 
   printf("\nPit Info:\n");
@@ -331,7 +328,4 @@ void ams2_shmem_print(const ams2_shmem *data) {
   printf("  mSessionIsPrivate: %s\n", data->mSessionIsPrivate ? "true" : "false");
   printf("  mLaunchStage: %d (%s)\n", data->mLaunchStage,
          launch_stage_names[data->mLaunchStage + 1] ? launch_stage_names[data->mLaunchStage + 1] : "UNKNOWN");
-
-  printf("\n=== End ===\n");
 }
-#pragma GCC diagnostic pop

@@ -249,7 +249,7 @@ typedef enum : int32_t {
   LAUNCH_ON,           // Launch control actively accelerating vehicle
 } LaunchStage;
 
-typedef struct __attribute__((packed)) {
+typedef struct {
   // Version Number
   unsigned int mVersion;            // [ RANGE = 0->... ]
   unsigned int mBuildVersionNumber; // [ RANGE = 0->... ] [ UNSET = 0 ]
