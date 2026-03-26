@@ -15,11 +15,13 @@
 const off_t REGION_SIZE = 0x6000;
 const int PLOT_WIDTH = 80;
 const int PLOT_HISTORY = 100;
+const int Y_RESOLUTION = 20; // 20 lines
 
 static const char *CSI = "\033[";
 static const char *RED = "\033[31m";
 static const char *GREEN = "\033[32m";
 static const char *BLUE = "\033[34m";
+static const char *WHITE = "\033[37m";
 static const char *RESET = "\033[0m";
 
 static void clear_screen(void) { printf("%s2J%sH", CSI, CSI); }
@@ -92,29 +94,41 @@ static void plot_line(const char *label, const char *color, float value, const c
   printf(" %.2f\n", value);
 }
 
-static void plot_overlay(float *history, int len, const char *color) {
-  for (int row = 10; row >= 0; row--) {
+// Braille characters encode 8 dots in a 2x4 grid:
+//   1  8
+//   2  16
+//   4  32
+//   64 128
+
+static void plot_overlay(float *history, int len, int marker_pos, const char *color) {
+  for (int vy = Y_RESOLUTION - 1; vy >= 0; vy--) {
+    float threshold = (float)vy / Y_RESOLUTION;
     printf("%s│%s", color, RESET);
+
     for (int i = 0; i < len; i++) {
-      int plot_row = (int)(history[i] * 10.0f);
-      if (plot_row == row) {
-        printf("%s●%s", color, RESET);
-      } else if (plot_row > row && plot_row < 10) {
-        printf("%s│%s", color, RESET);
+      float val = history[i];
+      int is_marker = (i == marker_pos);
+
+      if (is_marker) {
+        printf("%s█%s", WHITE, RESET);
+      } else if (val >= threshold) {
+        printf("%s█%s", color, RESET);
       } else {
         printf(" ");
       }
     }
-    printf("%s│%s %d%%\n", color, RESET, row * 10);
+
+    int percent = (int)((float)(Y_RESOLUTION - 1 - vy) / Y_RESOLUTION * 100);
+    printf("%s│%s %d%%\n", color, RESET, percent);
   }
 }
 
 static void plot_separator(const char *color) {
-  printf("%s├──%s", color, RESET);
-  for (int i = 0; i < PLOT_WIDTH - 6; i++) {
-    printf("%s─%s", color, RESET);
+  printf("%s├──", color);
+  for (int i = 0; i < PLOT_WIDTH; i++) {
+    printf("─");
   }
-  printf("%s──┤%s\n", color, RESET);
+  printf("──┤%s\n", RESET);
 }
 
 int main(int argc, char **argv) {
@@ -160,19 +174,23 @@ int main(int argc, char **argv) {
     plot_line("Brake", RED, data.mUnfilteredBrake, "█");
     plot_line("Steering", BLUE, data.mUnfilteredSteering, "█");
 
+    int marker_pos = (hist_idx + PLOT_HISTORY - 1) % PLOT_HISTORY;
+    int display_count = (hist_count < PLOT_HISTORY) ? hist_count : PLOT_HISTORY;
+    int start_idx = (hist_count < PLOT_HISTORY) ? 0 : hist_idx;
+
     printf("\n%sSteering:%s\n", BLUE, RESET);
     plot_separator(BLUE);
-    plot_overlay(steer_hist, hist_count, BLUE);
+    plot_overlay(steer_hist + start_idx, display_count, marker_pos - start_idx, BLUE);
     plot_separator(BLUE);
 
     printf("\n%sThrottle:%s\n", GREEN, RESET);
     plot_separator(GREEN);
-    plot_overlay(throttle_hist, hist_count, GREEN);
+    plot_overlay(throttle_hist + start_idx, display_count, marker_pos - start_idx, GREEN);
     plot_separator(GREEN);
 
     printf("\n%sBrake:%s\n", RED, RESET);
     plot_separator(RED);
-    plot_overlay(brake_hist, hist_count, RED);
+    plot_overlay(brake_hist + start_idx, display_count, marker_pos - start_idx, RED);
     plot_separator(RED);
 
     fflush(stdout);
