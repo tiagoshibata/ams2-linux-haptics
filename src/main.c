@@ -21,7 +21,6 @@ static const char *CSI = "\033[";
 static const char *RED = "\033[31m";
 static const char *GREEN = "\033[32m";
 static const char *BLUE = "\033[34m";
-static const char *WHITE = "\033[37m";
 static const char *RESET = "\033[0m";
 
 static void clear_screen(void) { printf("%s2J%sH", CSI, CSI); }
@@ -94,12 +93,6 @@ static void plot_line(const char *label, const char *color, float value, const c
   printf(" %.2f\n", value);
 }
 
-// Braille characters encode 8 dots in a 2x4 grid:
-//   1  8
-//   2  16
-//   4  32
-//   64 128
-
 static void plot_overlay(float *history, int len, int marker_pos, const char *color) {
   for (int vy = Y_RESOLUTION - 1; vy >= 0; vy--) {
     float threshold = (float)vy / Y_RESOLUTION;
@@ -110,16 +103,15 @@ static void plot_overlay(float *history, int len, int marker_pos, const char *co
       int is_marker = (i == marker_pos);
 
       if (is_marker) {
-        printf("%s█%s", WHITE, RESET);
+        printf("%s|%s", color, RESET);
       } else if (val >= threshold) {
-        printf("%s█%s", color, RESET);
+        printf("%s%c%s", color, 'o', RESET);
       } else {
         printf(" ");
       }
     }
 
-    int percent = (int)((float)(Y_RESOLUTION - 1 - vy) / Y_RESOLUTION * 100);
-    printf("%s│%s %d%%\n", color, RESET, percent);
+    printf("%s│%s %d%%\n", color, RESET, (Y_RESOLUTION - 1 - vy) * 100 / Y_RESOLUTION);
   }
 }
 
@@ -160,7 +152,7 @@ int main(int argc, char **argv) {
 
     throttle_hist[hist_idx] = data.mUnfilteredThrottle;
     brake_hist[hist_idx] = data.mUnfilteredBrake;
-    steer_hist[hist_idx] = (data.mUnfilteredSteering + 1.0f) / 2.0f; // remap -1..1 to 0..1
+    steer_hist[hist_idx] = (data.mUnfilteredSteering + 1.0f) / 2.0f;
     hist_idx = (hist_idx + 1) % PLOT_HISTORY;
     if (hist_count < PLOT_HISTORY) {
       hist_count++;
