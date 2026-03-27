@@ -466,7 +466,8 @@ typedef struct {
   bool mSessionIsPrivate; // true if this is a private session where users cannot see or interact with other drivers
                           // (and so would not need positional awareness of them etc)
   LaunchStage mLaunchStage;
-} ams2_shmem;
+} ams2_telemetry;
 
-// Debugging method
-void ams2_shmem_print(const ams2_shmem *data);
+int get_ams2_pid();
+void *get_ams2_telemetry_address(int pid);
+void read_ams2_telemetry(int pid, ams2_telemetry *local_addr, void *remote_addr);
