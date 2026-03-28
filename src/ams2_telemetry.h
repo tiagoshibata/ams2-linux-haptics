@@ -468,6 +468,14 @@ typedef struct {
   LaunchStage mLaunchStage;
 } ams2_telemetry;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int get_ams2_pid();
 void *get_ams2_telemetry_address(int pid);
 void read_ams2_telemetry(int pid, ams2_telemetry *local_addr, void *remote_addr);
+
+#ifdef __cplusplus
+}
+#endif
