@@ -7,6 +7,9 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-Wall -Wextra -Werror)
 
+# stdout telemetry logger
+add_executable(ams2_telemetry_logger src/telemetry_logger.c src/ams2_telemetry.c)
+
 include(FetchContent)
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 

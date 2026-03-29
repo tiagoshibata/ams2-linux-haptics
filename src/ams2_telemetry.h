@@ -203,9 +203,9 @@ typedef struct {
   char mName[STRING_LENGTH_MAX]; // [ string ]
   float mWorldPosition[VEC_MAX]; // [ UNITS = World Space ]
   float mCurrentLapDistance;     // [ UNITS = Metres ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  unsigned int mRacePosition;    // [ RANGE = 1->... ] [ UNSET = 0 ]
-  unsigned int mLapsCompleted;   // [ RANGE = 0->... ] [ UNSET = 0 ]
-  unsigned int mCurrentLap;      // [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned mRacePosition;        // [ RANGE = 1->... ] [ UNSET = 0 ]
+  unsigned mLapsCompleted;       // [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned mCurrentLap;          // [ RANGE = 0->... ] [ UNSET = 0 ]
   int mCurrentSector;            // [ RANGE = 0->... ] [ UNSET = -1 ]
 } ParticipantInfo;
 
@@ -250,8 +250,8 @@ typedef enum : int32_t {
 
 typedef struct {
   // Version Number
-  unsigned int mVersion;            // [ RANGE = 0->... ]
-  unsigned int mBuildVersionNumber; // [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned mVersion;            // [ RANGE = 0->... ]
+  unsigned mBuildVersionNumber; // [ RANGE = 0->... ] [ UNSET = 0 ]
 
   // Game States
   GameState mGameState;
@@ -274,7 +274,7 @@ typedef struct {
   char mCarClassName[STRING_LENGTH_MAX]; // [ string ]
 
   // Event information
-  unsigned int mLapsInEvent;               // [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned mLapsInEvent;                   // [ RANGE = 0->... ] [ UNSET = 0 ]
   char mTrackLocation[STRING_LENGTH_MAX];  // [ string ] - untranslated shortened English name
   char mTrackVariation[STRING_LENGTH_MAX]; // [ string ] - untranslated shortened English variation
   float mTrackLength;                      // [ UNITS = Metres ] [ RANGE = 0->... ] [ UNSET = 0 ]
@@ -382,8 +382,8 @@ typedef struct {
 
   // PCars2 additions start, version 8
   // Sequence Number to help slightly with data integrity reads
-  volatile unsigned int mSequenceNumber; // 0 at the start, incremented at start and end of writing, so odd when Shared
-                                         // Memory is being filled, even when the memory is not being touched
+  volatile unsigned mSequenceNumber; // 0 at the start, incremented at start and end of writing, so odd when Shared
+                                     // Memory is being filled, even when the memory is not being touched
 
   // Additional car variables
   float mWheelLocalPositionY[TYRE_MAX]; // [ UNITS = Local Space Y ]
@@ -423,7 +423,7 @@ typedef struct {
   PitSchedule mPitSchedules[STORED_PARTICIPANTS_MAX];
   FlagColour mHighestFlagColours[STORED_PARTICIPANTS_MAX];
   FlagReason mHighestFlagReasons[STORED_PARTICIPANTS_MAX];
-  unsigned int mNationalities[STORED_PARTICIPANTS_MAX]; // [ nationality table, SP AND UNSET = 0 ]
+  unsigned mNationalities[STORED_PARTICIPANTS_MAX]; // [ nationality table, SP AND UNSET = 0 ]
   float mSnowDensity; // [ UNITS = How much snow will fall ] [ RANGE = 0->1 ] non zero only in Winter and Snow seasons
 
   // AMS2 Additions (v10...)
@@ -445,8 +445,8 @@ typedef struct {
   float mRideHeight[TYRE_MAX]; // [ UNITS = cm ]
 
   // Input
-  unsigned int mJoyPad0; // button mask
-  unsigned int mDPad;    // button mask
+  unsigned mJoyPad0; // button mask
+  unsigned mDPad;    // button mask
 
   int mAntiLockSetting;        // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
   int mTractionControlSetting; // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
@@ -472,9 +472,9 @@ typedef struct {
 extern "C" {
 #endif
 
-int get_ams2_pid();
-void *get_ams2_telemetry_address(int pid);
-void read_ams2_telemetry(int pid, ams2_telemetry *local_addr, void *remote_addr);
+int wait_for_ams2_pid();
+const void *wait_for_ams2_telemetry_address(int pid);
+bool read_ams2_telemetry(int pid, ams2_telemetry *local_addr, const void *remote_addr);
 
 #ifdef __cplusplus
 }

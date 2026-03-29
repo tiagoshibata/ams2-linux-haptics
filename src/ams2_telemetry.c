@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/uio.h>
+#include <unistd.h>
 
 // Get AMS2 PID
-int get_ams2_pid() {
+static int get_ams2_pid() {
   DIR *proc_dir = opendir("/proc");
   if (!proc_dir) {
     perror("opendir /proc");
@@ -47,11 +48,23 @@ int get_ams2_pid() {
   return result;
 }
 
+int wait_for_ams2_pid() {
+  for (;;) {
+    int pid = get_ams2_pid();
+    if (pid) {
+      printf("Found AMS2 running with PID %d\n", pid);
+      return pid;
+    }
+    printf("No AMS2 process found. Retrying...\n");
+    sleep(1);
+  }
+}
+
 // Size of shared mem region created by AMS2
 const off_t REGION_SIZE = 0x6000;
 
 // Scan /proc/.../maps, and find virtual address in AMS2 space that hold telemetry shared mem
-void *get_ams2_telemetry_address(int pid) {
+static void *get_ams2_telemetry_address(int pid) {
   char maps_path[256];
   snprintf(maps_path, sizeof(maps_path), "/proc/%d/maps", pid);
 
@@ -85,8 +98,20 @@ void *get_ams2_telemetry_address(int pid) {
   return NULL;
 }
 
+const void *wait_for_ams2_telemetry_address(int pid) {
+  for (;;) {
+    void *remote_addr = get_ams2_telemetry_address(pid);
+    if (remote_addr) {
+      return remote_addr;
+    }
+    printf("AMS2 telemetry shared memory not found. Make sure AMS2 is fully initialized, and has its shared memory "
+           "enabled in settings. Retrying...\n");
+    sleep(1);
+  }
+}
+
 // Read memory from another process
-void read_ams2_telemetry(int pid, ams2_telemetry *local_addr, void *remote_addr) {
+bool read_ams2_telemetry(int pid, ams2_telemetry *local_addr, const void *remote_addr) {
   struct iovec local_iov = {
       .iov_base = (void *)local_addr,
       .iov_len = sizeof(ams2_telemetry),
@@ -97,9 +122,12 @@ void read_ams2_telemetry(int pid, ams2_telemetry *local_addr, void *remote_addr)
       .iov_len = sizeof(ams2_telemetry),
   };
 
+  unsigned prevSeqNum = local_addr->mSequenceNumber;
   ssize_t nread = process_vm_readv(pid, &local_iov, 1, &remote_iov, 1, 0);
   if (nread < 0) {
     perror("process_vm_readv"); // AMS2 exit, or not enough permissions
-    exit(1);
+    return false;
   }
+
+  return local_addr->mSequenceNumber != prevSeqNum && (local_addr->mSequenceNumber & 1) == 0;
 }

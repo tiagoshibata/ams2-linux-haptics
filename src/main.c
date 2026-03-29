@@ -1,7 +1,6 @@
 #include "ams2_telemetry.h"
 #include <stdio.h>
 #include <time.h>
-#include <unistd.h>
 
 const int BAR_WIDTH = 50;
 
@@ -27,26 +26,8 @@ static void print_bar(const char *label, const char *color, float value) {
 }
 
 int main() {
-  int pid;
-  do {
-    pid = get_ams2_pid();
-    if (pid) {
-      printf("Found AMS2 running with PID %d\n", pid);
-    } else {
-      printf("No AMS2 process found. Retrying...\n");
-      sleep(1);
-    }
-  } while (!pid);
-
-  void *remote_addr;
-  do {
-    remote_addr = get_ams2_telemetry_address(pid);
-    if (!remote_addr) {
-      printf("AMS2 telemetry shared memory not found. Make sure AMS2 is fully initialized, and has its shared memory "
-             "enabled in settings. Retrying...\n");
-      sleep(1);
-    }
-  } while (!remote_addr);
+  int pid = wait_for_ams2_pid();
+  void *remote_addr = wait_for_ams2_telemetry_address(pid);
 
   struct timespec ts = {
       .tv_sec = 0,
@@ -55,18 +36,18 @@ int main() {
 
   while (1) {
     ams2_telemetry tele;
-    read_ams2_telemetry(pid, &tele, remote_addr);
+    if (read_ams2_telemetry(pid, &tele, remote_addr)) {
+      clear_screen();
+      printf("AMS2 Telemetry\n");
+      printf("========================================\n");
 
-    clear_screen();
-    printf("AMS2 Telemetry\n");
-    printf("========================================\n");
+      print_bar("Throttle", GREEN, tele.mUnfilteredThrottle);
+      print_bar("Brake", RED, tele.mUnfilteredBrake);
+      print_bar("Steering", BLUE, (tele.mUnfilteredSteering + 1.0f) / 2.0f);
 
-    print_bar("Throttle", GREEN, tele.mUnfilteredThrottle);
-    print_bar("Brake", RED, tele.mUnfilteredBrake);
-    print_bar("Steering", BLUE, (tele.mUnfilteredSteering + 1.0f) / 2.0f);
-
-    printf("\n");
-    fflush(stdout);
+      printf("\n");
+      fflush(stdout);
+    }
     nanosleep(&ts, NULL);
   }
 

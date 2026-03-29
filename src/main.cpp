@@ -19,19 +19,8 @@ static constexpr int CANVAS_HEIGHT = 100;
 static constexpr int HISTORY_SIZE = CANVAS_WIDTH;
 
 int main() {
-  int pid;
-  while (!(pid = get_ams2_pid())) {
-    std::cout << "No AMS2 process found. Retrying...\n";
-    std::this_thread::sleep_for(5s);
-  }
-  std::cout << "Found AMS2 running with PID " << pid << '\n';
-
-  void *remote_addr;
-  while (!(remote_addr = get_ams2_telemetry_address(pid))) {
-    std::cout << "AMS2 telemetry shared memory not found. Make sure AMS2 is fully initialized, and the \"shared "
-                 "memory\" setting is enabled. Retrying...\n";
-    std::this_thread::sleep_for(5s);
-  }
+  auto pid = wait_for_ams2_pid();
+  const auto *remote_addr = wait_for_ams2_telemetry_address(pid);
 
   std::deque<float> throttle_history(HISTORY_SIZE, 0.0f);
   std::deque<float> brake_history(HISTORY_SIZE, 0.0f);
