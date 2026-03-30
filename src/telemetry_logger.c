@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
-static const char *game_state_names[] = {
+static const char *names_mGameState[] = {
     "GAME_EXITED",
     "GAME_FRONT_END",
     "GAME_INGAME_PLAYING",
@@ -14,17 +14,17 @@ static const char *game_state_names[] = {
     "GAME_FRONT_END_REPLAY",
 };
 
-static const char *session_state_names[] = {
+static const char *names_mSessionState[] = {
     "SESSION_INVALID",       "SESSION_PRACTICE", "SESSION_TEST",        "SESSION_QUALIFY",
     "SESSION_FORMATION_LAP", "SESSION_RACE",     "SESSION_TIME_ATTACK",
 };
 
-static const char *race_state_names[] = {
+static const char *names_mRaceStates[] = {
     "RACESTATE_INVALID",      "RACESTATE_NOT_STARTED", "RACESTATE_RACING", "RACESTATE_FINISHED",
     "RACESTATE_DISQUALIFIED", "RACESTATE_RETIRED",     "RACESTATE_DNF",
 };
 
-static const char *flag_colour_names[] = {
+static const char *names_mHighestFlagColours[] = {
     "FLAG_COLOUR_NONE",
     "FLAG_COLOUR_GREEN",
     "FLAG_COLOUR_BLUE",
@@ -39,12 +39,12 @@ static const char *flag_colour_names[] = {
     "FLAG_COLOUR_CHEQUERED",
 };
 
-static const char *pit_mode_names[] = {
+static const char *names_mPitModes[] = {
     "PIT_MODE_NONE",      "PIT_MODE_DRIVING_INTO_PITS",     "PIT_MODE_IN_PIT", "PIT_MODE_DRIVING_OUT_OF_PITS",
     "PIT_MODE_IN_GARAGE", "PIT_MODE_DRIVING_OUT_OF_GARAGE",
 };
 
-static const char *pit_schedule_names[] = {
+static const char *names_mPitSchedules[] = {
     "PIT_SCHEDULE_NONE",
     "PIT_SCHEDULE_PLAYER_REQUESTED",
     "PIT_SCHEDULE_ENGINEER_REQUESTED",
@@ -55,24 +55,24 @@ static const char *pit_schedule_names[] = {
     "PIT_SCHEDULE_PITSPOT_OCCUPIED",
 };
 
-static const char *crash_damage_names[] = {
+static const char *names_mCrashState[] = {
     "CRASH_DAMAGE_NONE",     "CRASH_DAMAGE_OFFTRACK", "CRASH_DAMAGE_LARGE_PROP",
     "CRASH_DAMAGE_SPINNING", "CRASH_DAMAGE_ROLLING",
 };
 
-static const char *ers_deployment_names[] = {
+static const char *names_mErsDeploymentMode[] = {
     "ERS_DEPLOYMENT_MODE_NONE",     "ERS_DEPLOYMENT_MODE_OFF",    "ERS_DEPLOYMENT_MODE_BUILD",
     "ERS_DEPLOYMENT_MODE_BALANCED", "ERS_DEPLOYMENT_MODE_ATTACK", "ERS_DEPLOYMENT_MODE_QUAL",
 };
 
-static const char *yellow_flag_state_names[] = {
+static const char *names_mYellowFlagState[] = {
     "YFS_INVALID",   "YFS_NONE",       "YFS_PENDING",  "YFS_PITS_CLOSED", "YFS_PIT_LEAD_LAP",
     "YFS_PITS_OPEN", "YFS_PITS_OPEN2", "YFS_LAST_LAP", "YFS_RESUME",      "YFS_RACE_HALT",
 };
 
-static const char *launch_stage_names[] = {"LAUNCH_INVALID", "LAUNCH_OFF", "LAUNCH_REV", "LAUNCH_ON"};
+static const char *names_mLaunchStage[] = {"LAUNCH_INVALID", "LAUNCH_OFF", "LAUNCH_REV", "LAUNCH_ON"};
 
-static const char *terrain_names[] = {
+static const char *names_mTyreTerrain[] = {
     "TERRAIN_ROAD",
     "TERRAIN_LOW_GRIP_ROAD",
     "TERRAIN_BUMPY_ROAD1",
@@ -126,7 +126,7 @@ static const char *terrain_names[] = {
     "TERRAIN_RALLY_TARMAC",
 };
 
-static const char *flag_reason_names[] = {
+static const char *names_mHighestFlagReasons[] = {
     "FLAG_REASON_NONE",
     "FLAG_REASON_SOLO_CRASH",
     "FLAG_REASON_VEHICLE_CRASH",
@@ -138,13 +138,13 @@ static const char *names_mCarFlags[] = {
     "CAR_TCS",       "CAR_SCS",
 };
 
-static const char *tyre_flag_names[] = {
+static const char *names_mTyreFlags[] = {
     "TYRE_ATTACHED",
     "TYRE_INFLATED",
     "TYRE_IS_ON_GROUND",
 };
 
-static const char *drs_state_names[] = {
+static const char *names_mDrsState[] = {
     "DRS_INSTALLED", "DRS_ZONE_RULES", "DRS_AVAILABLE_NEXT", "DRS_AVAILABLE_NOW", "DRS_ACTIVE",
 };
 
@@ -178,7 +178,7 @@ static void print_4f(const char *name, const float value[4]) {
   printf("\"%s\":[%f,%f,%f,%f],", name, value[0], value[1], value[2], value[3]);
 }
 
-static void print_f(const char *name, const float *value, int count) {
+static void print_array_f(const char *name, const float *value, int count) {
   printf("\"%s\":", name);
   if (!count) {
     printf("[],");
@@ -187,8 +187,38 @@ static void print_f(const char *name, const float *value, int count) {
 
   char sep = '[';
   for (int i = 0; i < count; i++) {
-      printf("%c%f", sep, value[i]);
-      sep = ',';
+    printf("%c%f", sep, value[i]);
+    sep = ',';
+  }
+  printf("],");
+}
+
+static void print_array_s(const char *name, const char values[64][64], int count) {
+  printf("\"%s\":", name);
+  if (!count) {
+    printf("[],");
+    return;
+  }
+
+  char sep = '[';
+  for (int i = 0; i < count; i++) {
+    printf("%c\"%.64s\"", sep, values[i]);
+    sep = ',';
+  }
+  printf("],");
+}
+
+static void print_array_enum(const char *name, const int *indices, const char **enum_values, int count) {
+  printf("\"%s\":", name);
+  if (!count) {
+    printf("[],");
+    return;
+  }
+
+  char sep = '[';
+  for (int i = 0; i < count; i++) {
+    printf("%c\"%s\"", sep, enum_values[indices[i]]);
+    sep = ',';
   }
   printf("],");
 }
@@ -196,27 +226,18 @@ static void print_f(const char *name, const float *value, int count) {
 #define PRINT_BITFLAG(key) print_bitflag(#key, tele->key, names_##key)
 #define PRINT_3F(key) print_3f(#key, tele->key)
 #define PRINT_4F(key) print_4f(#key, tele->key)
-#define PRINT_F(key, size) print_f(#key, tele->key, size)
-
-static void print_terrain_array_as_json(const char *name, const int32_t *values, int count) {
-  printf("\"%s\":[", name);
-  for (int i = 0; i < count; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%s\"", terrain_names[values[i]]);
-  }
-  printf("],");
-}
+#define PRINT_ARRAY_F(key, size) print_array_f(#key, tele->key, size)
+#define PRINT_ARRAY_S(key, size) print_array_s(#key, tele->key, size)
+#define PRINT_ARRAY_ENUM(key, size) print_array_enum(#key, tele->key, names_##key, size)
 
 static void print_as_json(const ams2_telemetry *tele) {
   printf("{\"mVersion\":%u,\"mBuildVersionNumber\":%u,\"mGameState\":\"%s\",\"mSessionState\":\"%s\",\"mRaceState\":\"%"
-         "s\",\"mViewedParticipantIndex\":%d,\"mParticipantInfo\":",
-         tele->mVersion, tele->mBuildVersionNumber, game_state_names[tele->mGameState],
-         session_state_names[tele->mSessionState], race_state_names[tele->mRaceState], tele->mViewedParticipantIndex);
+         "s\",\"mViewedParticipantIndex\":%d,",
+         tele->mVersion, tele->mBuildVersionNumber, names_mGameState[tele->mGameState],
+         names_mSessionState[tele->mSessionState], names_mRaceStates[tele->mRaceState], tele->mViewedParticipantIndex);
 
-  if (!tele->mNumParticipants) {
-    printf("[],");
-  } else {
+  if (tele->mNumParticipants) {
+    printf("\"mParticipantInfo\":");
     char sep = '[';
     for (int i = 0; i < tele->mNumParticipants; i++) {
       printf("%c{\"mIsActive\":%s,\"mName\":\"%.64s\",\"mWorldPosition\":[%f,%f,%f],\"mCurrentLapDistance\":%f,"
@@ -232,14 +253,13 @@ static void print_as_json(const ams2_telemetry *tele) {
   }
 
   PRINT_BITFLAG(mCarFlags);
-
   printf("\"mTyreFlags\":[");
   for (int i = 0; i < TYRE_MAX; ++i) {
-    print_bitflag_value(tele->mTyreFlags[i], tyre_flag_names);
+    print_bitflag_value(tele->mTyreFlags[i], names_mTyreFlags);
   }
   printf("],");
 
-  print_terrain_array_as_json("mTyreTerrain", tele->mTyreTerrain, TYRE_MAX);
+  PRINT_ARRAY_ENUM(mTyreTerrain, 4);
   printf(
       "\"mUnfilteredThrottle\":%f,\"mUnfilteredBrake\":%f,\"mUnfilteredSteering\":%f,\"mUnfilteredClutch\":%f,"
       "\"mCarName\":\"%.64s\",\"mCarClassName\":\"%.64s\",\"mLapsInEvent\":%u,\"mTrackLocation\":\"%.64s\","
@@ -263,9 +283,9 @@ static void print_as_json(const ams2_telemetry *tele) {
       tele->mCurrentSector2Time, tele->mCurrentSector3Time, tele->mFastestSector1Time, tele->mFastestSector2Time,
       tele->mFastestSector3Time, tele->mPersonalFastestSector1Time, tele->mPersonalFastestSector2Time,
       tele->mPersonalFastestSector3Time, tele->mWorldFastestSector1Time, tele->mWorldFastestSector2Time,
-      tele->mWorldFastestSector3Time, flag_colour_names[tele->mHighestFlagColour],
-      flag_reason_names[tele->mHighestFlagReason], pit_mode_names[tele->mPitMode],
-      pit_schedule_names[tele->mPitSchedule], tele->mOilTempCelsius, tele->mOilPressureKPa, tele->mWaterTempCelsius,
+      tele->mWorldFastestSector3Time, names_mHighestFlagColours[tele->mHighestFlagColour],
+      names_mHighestFlagReasons[tele->mHighestFlagReason], names_mPitModes[tele->mPitMode],
+      names_mPitSchedules[tele->mPitSchedule], tele->mOilTempCelsius, tele->mOilPressureKPa, tele->mWaterTempCelsius,
       tele->mWaterPressureKPa, tele->mFuelPressureKPa, tele->mFuelLevel, tele->mFuelCapacity, tele->mSpeed, tele->mRpm,
       tele->mMaxRPM, tele->mBrake, tele->mThrottle, tele->mClutch, tele->mSteering, tele->mGear, tele->mNumGears,
       tele->mOdometerKM, tele->mAntiLockActive ? "true" : "false", tele->mLastOpponentCollisionIndex,
@@ -295,7 +315,7 @@ static void print_as_json(const ams2_telemetry *tele) {
   printf("\"mCrashState\":\"%s\",\"mAeroDamage\":%f,\"mEngineDamage\":%f,\"mAmbientTemperature\":%f,"
          "\"mTrackTemperature\":%f,\"mRainDensity\":%f,\"mWindSpeed\":%f,\"mWindDirectionX\":%f,\"mWindDirectionY\":%f,"
          "\"mCloudBrightness\":%f,\"mSequenceNumber\":%u,",
-         crash_damage_names[tele->mCrashState], tele->mAeroDamage, tele->mEngineDamage, tele->mAmbientTemperature,
+         names_mCrashState[tele->mCrashState], tele->mAeroDamage, tele->mEngineDamage, tele->mAmbientTemperature,
          tele->mTrackTemperature, tele->mRainDensity, tele->mWindSpeed, tele->mWindDirectionX, tele->mWindDirectionY,
          tele->mCloudBrightness, tele->mSequenceNumber);
 
@@ -312,120 +332,66 @@ static void print_as_json(const ams2_telemetry *tele) {
          tele->mTurboBoostPressure, tele->mTyreCompound[0], tele->mTyreCompound[1], tele->mTyreCompound[2],
          tele->mTyreCompound[3], tele->mSnowDensity, tele->mSessionDuration, tele->mSessionAdditionalLaps);
 
-  print_4f("mTyreTempLeft", tele->mTyreTempLeft);
-  print_4f("mTyreTempCenter", tele->mTyreTempCenter);
-  print_4f("mTyreTempRight", tele->mTyreTempRight);
-  print_4f("mRideHeight", tele->mRideHeight);
+  PRINT_4F(mTyreTempLeft);
+  PRINT_4F(mTyreTempCenter);
+  PRINT_4F(mTyreTempRight);
+  PRINT_4F(mRideHeight);
 
-  print_bitflag("mDrsState", tele->mDrsState, drs_state_names);
+  PRINT_BITFLAG(mDrsState);
 
   printf("\"mJoyPad0\":%u,\"mDPad\":%u,\"mAntiLockSetting\":%d,\"mTractionControlSetting\":%d,\"mErsDeploymentMode\":"
          "\"%s\",\"mErsAutoModeEnabled\":%s,\"mClutchTemp\":%f,\"mClutchWear\":%f,\"mClutchOverheated\":%s,"
          "\"mClutchSlipping\":%s,\"mYellowFlagState\":\"%s\",\"mSessionIsPrivate\":%s,\"mLaunchStage\":\"%s\",",
          tele->mJoyPad0, tele->mDPad, tele->mAntiLockSetting, tele->mTractionControlSetting,
-         ers_deployment_names[tele->mErsDeploymentMode], tele->mErsAutoModeEnabled ? "true" : "false",
+         names_mErsDeploymentMode[tele->mErsDeploymentMode], tele->mErsAutoModeEnabled ? "true" : "false",
          tele->mClutchTemp, tele->mClutchWear, tele->mClutchOverheated ? "true" : "false",
-         tele->mClutchSlipping ? "true" : "false", yellow_flag_state_names[tele->mYellowFlagState],
-         tele->mSessionIsPrivate ? "true" : "false", launch_stage_names[tele->mLaunchStage + 1]);
+         tele->mClutchSlipping ? "true" : "false", names_mYellowFlagState[tele->mYellowFlagState],
+         tele->mSessionIsPrivate ? "true" : "false", names_mLaunchStage[tele->mLaunchStage + 1]);
 
-  PRINT_F(mCurrentSector1Times, tele->mNumParticipants);
-  PRINT_F(mCurrentSector2Times, tele->mNumParticipants);
-  PRINT_F(mCurrentSector3Times, tele->mNumParticipants);
-  PRINT_F(mFastestSector1Times, tele->mNumParticipants);
-  PRINT_F(mFastestSector2Times, tele->mNumParticipants);
-  PRINT_F(mFastestSector3Times, tele->mNumParticipants);
+  if (tele->mNumParticipants) {
+    PRINT_ARRAY_F(mCurrentSector1Times, tele->mNumParticipants);
+    PRINT_ARRAY_F(mCurrentSector2Times, tele->mNumParticipants);
+    PRINT_ARRAY_F(mCurrentSector3Times, tele->mNumParticipants);
+    PRINT_ARRAY_F(mFastestSector1Times, tele->mNumParticipants);
+    PRINT_ARRAY_F(mFastestSector2Times, tele->mNumParticipants);
+    PRINT_ARRAY_F(mFastestSector3Times, tele->mNumParticipants);
+    PRINT_ARRAY_F(mFastestLapTimes, tele->mNumParticipants);
+    PRINT_ARRAY_F(mLastLapTimes, tele->mNumParticipants);
 
-  printf("\"mFastestLapTimes\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("%f", tele->mFastestLapTimes[i]);
+    char sep = '[';
+    printf("\"mLapsInvalidated\":");
+    for (int i = 0; i < tele->mNumParticipants; i++) {
+      printf("%c%s", sep, tele->mLapsInvalidated[i] ? "true" : "false");
+      sep = ',';
+    }
+    printf("],");
+
+    PRINT_ARRAY_ENUM(mRaceStates, tele->mNumParticipants);
+    PRINT_ARRAY_ENUM(mPitModes, tele->mNumParticipants);
+
+    sep = '[';
+    printf("\"mOrientations\":[");
+    for (int i = 0; i < tele->mNumParticipants; i++) {
+      printf("%c[%f,%f,%f]", sep, tele->mOrientations[i][0], tele->mOrientations[i][1], tele->mOrientations[i][2]);
+      sep = ',';
+    }
+    printf("],");
+
+    PRINT_ARRAY_F(mSpeeds, tele->mNumParticipants);
+    PRINT_ARRAY_S(mCarNames, tele->mNumParticipants);
+    PRINT_ARRAY_S(mCarClassNames, tele->mNumParticipants);
+    PRINT_ARRAY_ENUM(mPitSchedules, tele->mNumParticipants);
+    PRINT_ARRAY_ENUM(mHighestFlagColours, tele->mNumParticipants);
+    PRINT_ARRAY_ENUM(mHighestFlagReasons, tele->mNumParticipants);
+
+    sep = '[';
+    printf("\"mNationalities\":[");
+    for (int i = 0; i < tele->mNumParticipants; i++) {
+      printf("%c%u", sep, tele->mNationalities[i]);
+      sep = ',';
+    }
+    printf("]");
   }
-  printf("],");
-  printf("\"mLastLapTimes\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("%f", tele->mLastLapTimes[i]);
-  }
-  printf("],");
-  printf("\"mLapsInvalidated\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("%s", tele->mLapsInvalidated[i] ? "true" : "false");
-  }
-  printf("],");
-  printf("\"mRaceStates\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%s\"", race_state_names[tele->mRaceStates[i]]);
-  }
-  printf("],");
-  printf("\"mPitModes\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%s\"", pit_mode_names[tele->mPitModes[i]]);
-  }
-  printf("],");
-  printf("\"mOrientations\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("[%f,%f,%f]", tele->mOrientations[i][0], tele->mOrientations[i][1], tele->mOrientations[i][2]);
-  }
-  printf("],");
-  printf("\"mSpeeds\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("%f", tele->mSpeeds[i]);
-  }
-  printf("],");
-  printf("\"mCarNames\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%.64s\"", tele->mCarNames[i]);
-  }
-  printf("],");
-  printf("\"mCarClassNames\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%.64s\"", tele->mCarClassNames[i]);
-  }
-  printf("],");
-  printf("\"mPitSchedules\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%s\"", pit_schedule_names[tele->mPitSchedules[i]]);
-  }
-  printf("],");
-  printf("\"mHighestFlagColours\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%s\"", flag_colour_names[tele->mHighestFlagColours[i]]);
-  }
-  printf("],");
-  printf("\"mHighestFlagReasons\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("\"%s\"", flag_reason_names[tele->mHighestFlagReasons[i]]);
-  }
-  printf("],");
-  printf("\"mNationalities\":[");
-  for (int i = 0; i < tele->mNumParticipants; i++) {
-    if (i > 0)
-      printf(",");
-    printf("%u", tele->mNationalities[i]);
-  }
-  printf("]");
 
   printf("}\n");
 }
