@@ -10,6 +10,7 @@ add_compile_options(-Wall -Wextra -Werror)
 # stdout telemetry logger
 add_executable(ams2_telemetry_logger src/telemetry_logger.c src/ams2_telemetry.c)
 
+# Sample apps
 include(FetchContent)
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 
@@ -22,4 +23,7 @@ FetchContent_Declare(ftxui
 FetchContent_MakeAvailable(ftxui)
 
 add_executable(ams2_haptics src/main.cpp src/ams2_telemetry.c src/telemetry_debug_log.c)
-target_link_libraries(ams2_haptics PRIVATE ftxui::screen ftxui::dom ftxui::component)
+target_link_libraries(ams2_haptics PRIVATE ftxui::screen ftxui::component)
+
+add_executable(ams2_wheel_slip src/wheel_slip.cpp src/ams2_telemetry.c)
+target_link_libraries(ams2_wheel_slip PRIVATE ftxui::screen ftxui::component)
