@@ -75,7 +75,9 @@ int main() {
 
     using namespace ftxui;
     return vbox({
-        text(std::format("Speed: {}m/s Tyre: {}RPS = {}m/s", x_vel, tele.mTyreRPS[0], TYRE_DIAMETER / 2 * tele.mTyreRPS[0])) | bold,
+        text(std::format("Speed: {}m/s Tyre: {}RPS = {}m/s", x_vel, tele.mTyreRPS[0],
+                         TYRE_DIAMETER / 2 * tele.mTyreRPS[0])) |
+            bold,
         separator(),
         hbox({
             text("FL: "),

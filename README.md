@@ -20,7 +20,9 @@ nothing runs in Wine, and no Windows APIs are involved!
 
 I believe this is the first project to have **native** support for sim racing
 telemetry. Other projects require some bridge to expose Wine's shared memory to
-Linux.
+Linux. The core idea is that, since Wine is a shim to run Windows applications
+natively as a Linux process, it must be possible to use Linux syscalls to read
+into the app memory.
 
 This project scans the target process to locate the shared memory address in its
 memory space, then reads it with `process_vm_readv`. It's technically not

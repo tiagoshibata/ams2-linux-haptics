@@ -27,3 +27,10 @@ target_link_libraries(ams2_haptics PRIVATE ftxui::screen ftxui::component)
 
 add_executable(ams2_wheel_slip src/wheel_slip.cpp src/ams2_telemetry.c)
 target_link_libraries(ams2_wheel_slip PRIVATE ftxui::screen ftxui::component)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(PIPEWIRE IMPORTED_TARGET libpipewire-0.3)
+if(PIPEWIRE_FOUND)
+  add_executable(pipewire-tone src/pipewire_tone.c)
+  target_link_libraries(pipewire-tone PRIVATE PkgConfig::PIPEWIRE m)
+endif()
