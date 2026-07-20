@@ -1,4 +1,3 @@
-#include "ams2_telemetry.h"
 #include <deque>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_base.hpp>
@@ -9,6 +8,8 @@
 #include <ftxui/screen/screen.hpp>
 #include <stop_token>
 #include <thread>
+
+#include "ams2_telemetry.h"
 
 using namespace std::chrono_literals;
 

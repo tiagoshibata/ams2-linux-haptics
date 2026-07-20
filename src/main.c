@@ -1,6 +1,7 @@
-#include "ams2_telemetry.h"
 #include <stdio.h>
 #include <time.h>
+
+#include "ams2_telemetry.h"
 
 const int BAR_WIDTH = 50;
 

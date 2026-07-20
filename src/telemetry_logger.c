@@ -1,7 +1,8 @@
-#include "ams2_telemetry.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
+
+#include "ams2_telemetry.h"
 
 static const char *names_mGameState[] = {
     "GAME_EXITED",

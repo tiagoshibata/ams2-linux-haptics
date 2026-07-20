@@ -1,7 +1,8 @@
 // This is opencode generated, and used only for debugging. I didn't check for correctness - it might be missing fields
 // or have mistakes
-#include "ams2_telemetry.h"
 #include <stdio.h>
+
+#include "ams2_telemetry.h"
 
 static const char *game_state_names[] = {
     "GAME_EXITED",

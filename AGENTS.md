@@ -6,7 +6,7 @@ Companion tool for Automobilista 2 (AMS2) sim-racing game. Reads shared memory t
 
 - If unsure, ask for clarification
 - If a local change is requested, ONLY do that. If the change requires broader edits, ask for confirmation
-- DO NOT, under ANY circunstances, make code changes when the user makes a non-coding request (such as "show me all LSP flags")
+- DO NOT, under ANY circumstances, make code changes when the user makes a non-coding request (such as "show me all LSP flags")
   - If, while investigating LSP, you notice that the build is broken, TELL the user
 - DO NOT delete existing comments
 - Improvement plans are welcome - as you make changes, try to leave the codebase better than you found it. But you MUST ask for confirmation first

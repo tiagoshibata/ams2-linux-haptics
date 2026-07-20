@@ -3,12 +3,24 @@ project(ams2_haptics LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-Wall -Wextra -Werror)
 
+# carquet parquet library (submodule)
+set(CARQUET_BUILD_CLI OFF CACHE BOOL "" FORCE)
+add_subdirectory(carquet EXCLUDE_FROM_ALL)
+target_compile_options(carquet PRIVATE -Wno-error)
+
 # stdout telemetry logger
 add_executable(ams2_telemetry_logger src/telemetry_logger.c src/ams2_telemetry.c)
+
+# parquet telemetry logger
+add_executable(ams2_parquet_logger src/telemetry_parquet.c src/ams2_telemetry.c)
+target_link_libraries(ams2_parquet_logger PRIVATE carquet)
 
 # Sample apps
 include(FetchContent)

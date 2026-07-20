@@ -1,10 +1,10 @@
 #define _GNU_SOURCE
 #include <getopt.h>
 #include <math.h>
-#include <pipewire/pipewire.h>
 #include <stdint.h>
 #include <stdio.h>
 
+#include <pipewire/pipewire.h>
 #include <spa/param/audio/raw-utils.h>
 #include <spa/param/audio/raw.h>
 #include <spa/param/param.h>

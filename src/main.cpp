@@ -1,4 +1,3 @@
-#include "ams2_telemetry.h"
 #include <chrono>
 #include <deque>
 #include <ftxui/component/component.hpp>
@@ -11,6 +10,8 @@
 #include <iostream>
 #include <stop_token>
 #include <thread>
+
+#include "ams2_telemetry.h"
 
 using namespace std::chrono_literals;
 

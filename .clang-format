@@ -1,2 +1,20 @@
 ---
 ColumnLimit: 120
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  # C stdlib
+  - Regex: '^<([^/]+|sys/.*).h>$'
+    Priority: 1
+
+  # C++ stdlib
+  - Regex: '^<[^/]+'
+    Priority: 2
+
+  # Libraries
+  - Regex: '^<'
+    Priority: 3
+
+  # Project includes
+  - Regex: '^".*"$'
+    Priority: 4
