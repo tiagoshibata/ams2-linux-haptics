@@ -18,107 +18,79 @@ static void handle_signal(int) { signal_received = 1; }
 
 // RecordBatch to be written
 //
-// Field order mirrors the AMS2 shared memory struct.
+// Field names and order mirror the AMS2 shared memory struct.
+// Array fields use [dim][BATCH_SIZE] layout so each component is contiguous.
 typedef struct {
   // Game States
-  int32_t game_state[BATCH_SIZE];
-  int32_t session_state[BATCH_SIZE];
-  int32_t race_state[BATCH_SIZE];
+  int32_t mGameState[BATCH_SIZE];
+  int32_t mSessionState[BATCH_SIZE];
+  int32_t mRaceState[BATCH_SIZE];
 
   // Unfiltered Input
-  float unfiltered_throttle[BATCH_SIZE];
-  float unfiltered_brake[BATCH_SIZE];
-  float unfiltered_steering[BATCH_SIZE];
-  float unfiltered_clutch[BATCH_SIZE];
+  float mUnfilteredThrottle[BATCH_SIZE];
+  float mUnfilteredBrake[BATCH_SIZE];
+  float mUnfilteredSteering[BATCH_SIZE];
+  float mUnfilteredClutch[BATCH_SIZE];
 
   // Timings
-  float best_lap_time[BATCH_SIZE];
-  float last_lap_time[BATCH_SIZE];
-  float current_time[BATCH_SIZE];
+  float mBestLapTime[BATCH_SIZE];
+  float mLastLapTime[BATCH_SIZE];
+  float mCurrentTime[BATCH_SIZE];
 
   // Car State
-  float oil_temp[BATCH_SIZE];
-  float oil_pressure[BATCH_SIZE];
-  float water_temp[BATCH_SIZE];
-  float water_pressure[BATCH_SIZE];
-  float fuel_pressure[BATCH_SIZE];
-  float fuel_level[BATCH_SIZE];
-  float fuel_capacity[BATCH_SIZE];
-  float speed[BATCH_SIZE];
-  float rpm[BATCH_SIZE];
-  float max_rpm[BATCH_SIZE];
-  float brake[BATCH_SIZE];
-  float throttle[BATCH_SIZE];
-  float clutch[BATCH_SIZE];
-  float steering[BATCH_SIZE];
-  int32_t gear[BATCH_SIZE];
+  float mOilTempCelsius[BATCH_SIZE];
+  float mOilPressureKPa[BATCH_SIZE];
+  float mWaterTempCelsius[BATCH_SIZE];
+  float mWaterPressureKPa[BATCH_SIZE];
+  float mFuelPressureKPa[BATCH_SIZE];
+  float mFuelLevel[BATCH_SIZE];
+  float mFuelCapacity[BATCH_SIZE];
+  float mSpeed[BATCH_SIZE];
+  float mRpm[BATCH_SIZE];
+  float mMaxRPM[BATCH_SIZE];
+  float mBrake[BATCH_SIZE];
+  float mThrottle[BATCH_SIZE];
+  float mClutch[BATCH_SIZE];
+  float mSteering[BATCH_SIZE];
+  int32_t mGear[BATCH_SIZE];
 
   // Motion
-  float orient_x[BATCH_SIZE];
-  float orient_y[BATCH_SIZE];
-  float orient_z[BATCH_SIZE];
-  float local_vel_x[BATCH_SIZE];
-  float local_vel_y[BATCH_SIZE];
-  float local_vel_z[BATCH_SIZE];
-  float world_vel_x[BATCH_SIZE];
-  float world_vel_y[BATCH_SIZE];
-  float world_vel_z[BATCH_SIZE];
-  float local_accel_x[BATCH_SIZE];
-  float local_accel_y[BATCH_SIZE];
-  float local_accel_z[BATCH_SIZE];
-  float world_accel_x[BATCH_SIZE];
-  float world_accel_y[BATCH_SIZE];
-  float world_accel_z[BATCH_SIZE];
+  float mOrientation[BATCH_SIZE][VEC_MAX];
+  float mLocalVelocity[BATCH_SIZE][VEC_MAX];
+  float mWorldVelocity[BATCH_SIZE][VEC_MAX];
+  float mLocalAcceleration[BATCH_SIZE][VEC_MAX];
+  float mWorldAcceleration[BATCH_SIZE][VEC_MAX];
 
   // Wheels / Tyres
-  float tyre_temp_fl[BATCH_SIZE];
-  float tyre_temp_fr[BATCH_SIZE];
-  float tyre_temp_rl[BATCH_SIZE];
-  float tyre_temp_rr[BATCH_SIZE];
-  float tyre_wear_fl[BATCH_SIZE];
-  float tyre_wear_fr[BATCH_SIZE];
-  float tyre_wear_rl[BATCH_SIZE];
-  float tyre_wear_rr[BATCH_SIZE];
-  float brake_temp_fl[BATCH_SIZE];
-  float brake_temp_fr[BATCH_SIZE];
-  float brake_temp_rl[BATCH_SIZE];
-  float brake_temp_rr[BATCH_SIZE];
+  float mTyreTemp[BATCH_SIZE][TYRE_MAX];
+  float mTyreWear[BATCH_SIZE][TYRE_MAX];
+  float mBrakeTempCelsius[BATCH_SIZE][TYRE_MAX];
 
   // Car Damage
-  float aero_damage[BATCH_SIZE];
-  float engine_damage[BATCH_SIZE];
+  float mAeroDamage[BATCH_SIZE];
+  float mEngineDamage[BATCH_SIZE];
 
   // Weather
-  float ambient_temp[BATCH_SIZE];
-  float track_temp[BATCH_SIZE];
-  float rain_density[BATCH_SIZE];
-  float wind_speed[BATCH_SIZE];
-  float wind_dir_x[BATCH_SIZE];
-  float wind_dir_y[BATCH_SIZE];
+  float mAmbientTemperature[BATCH_SIZE];
+  float mTrackTemperature[BATCH_SIZE];
+  float mRainDensity[BATCH_SIZE];
+  float mWindSpeed[BATCH_SIZE];
+  float mWindDirectionX[BATCH_SIZE];
+  float mWindDirectionY[BATCH_SIZE];
 
   // PCars2 additions
-  float susp_travel_fl[BATCH_SIZE];
-  float susp_travel_fr[BATCH_SIZE];
-  float susp_travel_rl[BATCH_SIZE];
-  float susp_travel_rr[BATCH_SIZE];
-  float air_pressure_fl[BATCH_SIZE];
-  float air_pressure_fr[BATCH_SIZE];
-  float air_pressure_rl[BATCH_SIZE];
-  float air_pressure_rr[BATCH_SIZE];
-  float engine_speed[BATCH_SIZE];
-  float engine_torque[BATCH_SIZE];
-  float wing_front[BATCH_SIZE];
-  float wing_rear[BATCH_SIZE];
-  float handbrake[BATCH_SIZE];
+  float mSuspensionTravel[BATCH_SIZE][TYRE_MAX];
+  float mAirPressure[BATCH_SIZE][TYRE_MAX];
+  float mEngineSpeed[BATCH_SIZE];
+  float mEngineTorque[BATCH_SIZE];
+  float mWings[BATCH_SIZE][2];
+  float mHandBrake[BATCH_SIZE];
 
   // More race variables
-  float brake_bias[BATCH_SIZE];
+  float mBrakeBias[BATCH_SIZE];
 
   // AMS2 additions
-  float ride_height_fl[BATCH_SIZE];
-  float ride_height_fr[BATCH_SIZE];
-  float ride_height_rl[BATCH_SIZE];
-  float ride_height_rr[BATCH_SIZE];
+  float mRideHeight[BATCH_SIZE][TYRE_MAX];
 
   int32_t count;
 } row_buffer_t;
@@ -128,113 +100,120 @@ typedef struct {
 typedef struct {
   const char *name;
   carquet_physical_type_t type;
-  size_t offset;
+  size_t buf_offset;
+  size_t tele_offset;
+  size_t elem_size;
 } column_info_t;
 
-#define FLOAT_COL(field, col_name) {col_name, CARQUET_PHYSICAL_FLOAT, offsetof(row_buffer_t, field)}
-#define INT32_COL(field, col_name) {col_name, CARQUET_PHYSICAL_INT32, offsetof(row_buffer_t, field)}
+#define FLOAT_COL(field, col_name)                                                                                     \
+  {col_name, CARQUET_PHYSICAL_FLOAT, offsetof(row_buffer_t, field), offsetof(ams2_telemetry, field), sizeof(float)}
+#define INT32_COL(field, col_name)                                                                                     \
+  {col_name, CARQUET_PHYSICAL_INT32, offsetof(row_buffer_t, field), offsetof(ams2_telemetry, field), sizeof(int32_t)}
+#define FLOAT_COL_AT(field, idx, col_name)                                                                             \
+  {col_name, CARQUET_PHYSICAL_FLOAT, offsetof(row_buffer_t, field) + (idx) * BATCH_SIZE * sizeof(float),               \
+   offsetof(ams2_telemetry, field) + (idx) * sizeof(float), sizeof(float)}
 
 // clang-format off
 static const column_info_t columns[] = {
     // Game States
-    INT32_COL(game_state, "GameState"),
-    INT32_COL(session_state, "SessionState"),
-    INT32_COL(race_state, "RaceState"),
+    INT32_COL(mGameState, "GameState"),
+    INT32_COL(mSessionState, "SessionState"),
+    INT32_COL(mRaceState, "RaceState"),
 
     // Unfiltered Input
-    FLOAT_COL(unfiltered_throttle, "UnfilteredThrottle"),
-    FLOAT_COL(unfiltered_brake, "UnfilteredBrake"),
-    FLOAT_COL(unfiltered_steering, "UnfilteredSteering"),
-    FLOAT_COL(unfiltered_clutch, "UnfilteredClutch"),
+    FLOAT_COL(mUnfilteredThrottle, "UnfilteredThrottle"),
+    FLOAT_COL(mUnfilteredBrake, "UnfilteredBrake"),
+    FLOAT_COL(mUnfilteredSteering, "UnfilteredSteering"),
+    FLOAT_COL(mUnfilteredClutch, "UnfilteredClutch"),
 
     // Timings
-    FLOAT_COL(best_lap_time, "BestLapTime"),
-    FLOAT_COL(last_lap_time, "LastLapTime"),
-    FLOAT_COL(current_time, "CurrentTime"),
+    FLOAT_COL(mBestLapTime, "BestLapTime"),
+    FLOAT_COL(mLastLapTime, "LastLapTime"),
+    FLOAT_COL(mCurrentTime, "CurrentTime"),
 
     // Car State
-    FLOAT_COL(oil_temp, "OilTempCelsius"),
-    FLOAT_COL(oil_pressure, "OilPressureKPa"),
-    FLOAT_COL(water_temp, "WaterTempCelsius"),
-    FLOAT_COL(water_pressure, "WaterPressureKPa"),
-    FLOAT_COL(fuel_pressure, "FuelPressureKPa"),
-    FLOAT_COL(fuel_level, "FuelLevel"),
-    FLOAT_COL(fuel_capacity, "FuelCapacity"),
-    FLOAT_COL(speed, "Speed"),
-    FLOAT_COL(rpm, "Rpm"),
-    FLOAT_COL(max_rpm, "MaxRpm"),
-    FLOAT_COL(brake, "Brake"),
-    FLOAT_COL(throttle, "Throttle"),
-    FLOAT_COL(clutch, "Clutch"),
-    FLOAT_COL(steering, "Steering"),
-    INT32_COL(gear, "Gear"),
+    FLOAT_COL(mOilTempCelsius, "OilTempCelsius"),
+    FLOAT_COL(mOilPressureKPa, "OilPressureKPa"),
+    FLOAT_COL(mWaterTempCelsius, "WaterTempCelsius"),
+    FLOAT_COL(mWaterPressureKPa, "WaterPressureKPa"),
+    FLOAT_COL(mFuelPressureKPa, "FuelPressureKPa"),
+    FLOAT_COL(mFuelLevel, "FuelLevel"),
+    FLOAT_COL(mFuelCapacity, "FuelCapacity"),
+    FLOAT_COL(mSpeed, "Speed"),
+    FLOAT_COL(mRpm, "Rpm"),
+    FLOAT_COL(mMaxRPM, "MaxRpm"),
+    FLOAT_COL(mBrake, "Brake"),
+    FLOAT_COL(mThrottle, "Throttle"),
+    FLOAT_COL(mClutch, "Clutch"),
+    FLOAT_COL(mSteering, "Steering"),
+    INT32_COL(mGear, "Gear"),
 
     // Motion
-    FLOAT_COL(orient_x, "OrientationX"),
-    FLOAT_COL(orient_y, "OrientationY"),
-    FLOAT_COL(orient_z, "OrientationZ"),
-    FLOAT_COL(local_vel_x, "LocalVelocityX"),
-    FLOAT_COL(local_vel_y, "LocalVelocityY"),
-    FLOAT_COL(local_vel_z, "LocalVelocityZ"),
-    FLOAT_COL(world_vel_x, "WorldVelocityX"),
-    FLOAT_COL(world_vel_y, "WorldVelocityY"),
-    FLOAT_COL(world_vel_z, "WorldVelocityZ"),
-    FLOAT_COL(local_accel_x, "LocalAccelerationX"),
-    FLOAT_COL(local_accel_y, "LocalAccelerationY"),
-    FLOAT_COL(local_accel_z, "LocalAccelerationZ"),
-    FLOAT_COL(world_accel_x, "WorldAccelerationX"),
-    FLOAT_COL(world_accel_y, "WorldAccelerationY"),
-    FLOAT_COL(world_accel_z, "WorldAccelerationZ"),
+    FLOAT_COL_AT(mOrientation, VEC_X, "OrientationX"),
+    FLOAT_COL_AT(mOrientation, VEC_Y, "OrientationY"),
+    FLOAT_COL_AT(mOrientation, VEC_Z, "OrientationZ"),
+    FLOAT_COL_AT(mLocalVelocity, VEC_X, "LocalVelocityX"),
+    FLOAT_COL_AT(mLocalVelocity, VEC_Y, "LocalVelocityY"),
+    FLOAT_COL_AT(mLocalVelocity, VEC_Z, "LocalVelocityZ"),
+    FLOAT_COL_AT(mWorldVelocity, VEC_X, "WorldVelocityX"),
+    FLOAT_COL_AT(mWorldVelocity, VEC_Y, "WorldVelocityY"),
+    FLOAT_COL_AT(mWorldVelocity, VEC_Z, "WorldVelocityZ"),
+    FLOAT_COL_AT(mLocalAcceleration, VEC_X, "LocalAccelerationX"),
+    FLOAT_COL_AT(mLocalAcceleration, VEC_Y, "LocalAccelerationY"),
+    FLOAT_COL_AT(mLocalAcceleration, VEC_Z, "LocalAccelerationZ"),
+    FLOAT_COL_AT(mWorldAcceleration, VEC_X, "WorldAccelerationX"),
+    FLOAT_COL_AT(mWorldAcceleration, VEC_Y, "WorldAccelerationY"),
+    FLOAT_COL_AT(mWorldAcceleration, VEC_Z, "WorldAccelerationZ"),
 
     // Wheels / Tyres
-    FLOAT_COL(tyre_temp_fl, "TyreTempFl"),
-    FLOAT_COL(tyre_temp_fr, "TyreTempFr"),
-    FLOAT_COL(tyre_temp_rl, "TyreTempRl"),
-    FLOAT_COL(tyre_temp_rr, "TyreTempRr"),
-    FLOAT_COL(tyre_wear_fl, "TyreWearFl"),
-    FLOAT_COL(tyre_wear_fr, "TyreWearFr"),
-    FLOAT_COL(tyre_wear_rl, "TyreWearRl"),
-    FLOAT_COL(tyre_wear_rr, "TyreWearRr"),
-    FLOAT_COL(brake_temp_fl, "BrakeTempFl"),
-    FLOAT_COL(brake_temp_fr, "BrakeTempFr"),
-    FLOAT_COL(brake_temp_rl, "BrakeTempRl"),
-    FLOAT_COL(brake_temp_rr, "BrakeTempRr"),
+    FLOAT_COL_AT(mTyreTemp, TYRE_FRONT_LEFT, "TyreTempFl"),
+    FLOAT_COL_AT(mTyreTemp, TYRE_FRONT_RIGHT, "TyreTempFr"),
+    FLOAT_COL_AT(mTyreTemp, TYRE_REAR_LEFT, "TyreTempRl"),
+    FLOAT_COL_AT(mTyreTemp, TYRE_REAR_RIGHT, "TyreTempRr"),
+    FLOAT_COL_AT(mTyreWear, TYRE_FRONT_LEFT, "TyreWearFl"),
+    FLOAT_COL_AT(mTyreWear, TYRE_FRONT_RIGHT, "TyreWearFr"),
+    FLOAT_COL_AT(mTyreWear, TYRE_REAR_LEFT, "TyreWearRl"),
+    FLOAT_COL_AT(mTyreWear, TYRE_REAR_RIGHT, "TyreWearRr"),
+    FLOAT_COL_AT(mBrakeTempCelsius, TYRE_FRONT_LEFT, "BrakeTempFl"),
+    FLOAT_COL_AT(mBrakeTempCelsius, TYRE_FRONT_RIGHT, "BrakeTempFr"),
+    FLOAT_COL_AT(mBrakeTempCelsius, TYRE_REAR_LEFT, "BrakeTempRl"),
+    FLOAT_COL_AT(mBrakeTempCelsius, TYRE_REAR_RIGHT, "BrakeTempRr"),
 
     // Car Damage
-    FLOAT_COL(aero_damage, "AeroDamage"),
-    FLOAT_COL(engine_damage, "EngineDamage"),
+    FLOAT_COL(mAeroDamage, "AeroDamage"),
+    FLOAT_COL(mEngineDamage, "EngineDamage"),
 
     // Weather
-    FLOAT_COL(ambient_temp, "AmbientTemperature"),
-    FLOAT_COL(track_temp, "TrackTemperature"),
-    FLOAT_COL(rain_density, "RainDensity"),
-    FLOAT_COL(wind_speed, "WindSpeed"),
-    FLOAT_COL(wind_dir_x, "WindDirectionX"),
-    FLOAT_COL(wind_dir_y, "WindDirectionY"),
+    FLOAT_COL(mAmbientTemperature, "AmbientTemperature"),
+    FLOAT_COL(mTrackTemperature, "TrackTemperature"),
+    FLOAT_COL(mRainDensity, "RainDensity"),
+    FLOAT_COL(mWindSpeed, "WindSpeed"),
+    FLOAT_COL(mWindDirectionX, "WindDirectionX"),
+    FLOAT_COL(mWindDirectionY, "WindDirectionY"),
 
     // PCars2 additions
-    FLOAT_COL(susp_travel_fl, "SuspensionTravelFl"),
-    FLOAT_COL(susp_travel_fr, "SuspensionTravelFr"),
-    FLOAT_COL(susp_travel_rl, "SuspensionTravelRl"),
-    FLOAT_COL(susp_travel_rr, "SuspensionTravelRr"),
-    FLOAT_COL(air_pressure_fl, "AirPressureFl"),
-    FLOAT_COL(air_pressure_fr, "AirPressureFr"),
-    FLOAT_COL(air_pressure_rl, "AirPressureRl"),
-    FLOAT_COL(air_pressure_rr, "AirPressureRr"),
-    FLOAT_COL(engine_speed, "EngineSpeed"),
-    FLOAT_COL(engine_torque, "EngineTorque"),
-    FLOAT_COL(wing_front, "WingFront"),
-    FLOAT_COL(wing_rear, "WingRear"),
-    FLOAT_COL(handbrake, "HandBrake"),
+    FLOAT_COL_AT(mSuspensionTravel, TYRE_FRONT_LEFT, "SuspensionTravelFl"),
+    FLOAT_COL_AT(mSuspensionTravel, TYRE_FRONT_RIGHT, "SuspensionTravelFr"),
+    FLOAT_COL_AT(mSuspensionTravel, TYRE_REAR_LEFT, "SuspensionTravelRl"),
+    FLOAT_COL_AT(mSuspensionTravel, TYRE_REAR_RIGHT, "SuspensionTravelRr"),
+    FLOAT_COL_AT(mAirPressure, TYRE_FRONT_LEFT, "AirPressureFl"),
+    FLOAT_COL_AT(mAirPressure, TYRE_FRONT_RIGHT, "AirPressureFr"),
+    FLOAT_COL_AT(mAirPressure, TYRE_REAR_LEFT, "AirPressureRl"),
+    FLOAT_COL_AT(mAirPressure, TYRE_REAR_RIGHT, "AirPressureRr"),
+    FLOAT_COL(mEngineSpeed, "EngineSpeed"),
+    FLOAT_COL(mEngineTorque, "EngineTorque"),
+    FLOAT_COL_AT(mWings, 0, "WingFront"),
+    FLOAT_COL_AT(mWings, 1, "WingRear"),
+    FLOAT_COL(mHandBrake, "HandBrake"),
 
     // More race variables
-    FLOAT_COL(brake_bias, "BrakeBias"),
+    FLOAT_COL(mBrakeBias, "BrakeBias"),
 
     // AMS2 additions
-    FLOAT_COL(ride_height_fl, "RideHeightFl"),
-    FLOAT_COL(ride_height_fr, "RideHeightFr"),
-    FLOAT_COL(ride_height_rl, "RideHeightRl"),
-    FLOAT_COL(ride_height_rr, "RideHeightRr"),
+    FLOAT_COL_AT(mRideHeight, TYRE_FRONT_LEFT, "RideHeightFl"),
+    FLOAT_COL_AT(mRideHeight, TYRE_FRONT_RIGHT, "RideHeightFr"),
+    FLOAT_COL_AT(mRideHeight, TYRE_REAR_LEFT, "RideHeightRl"),
+    FLOAT_COL_AT(mRideHeight, TYRE_REAR_RIGHT, "RideHeightRr"),
 };
 // clang-format on
 
@@ -264,106 +243,11 @@ static carquet_schema_t *create_schema(carquet_error_t *err) {
 
 static void buffer_add_row(row_buffer_t *buf, const ams2_telemetry *tele) {
   int i = buf->count++;
-
-  // Game States
-  buf->game_state[i] = (int32_t)tele->mGameState;
-  buf->session_state[i] = (int32_t)tele->mSessionState;
-  buf->race_state[i] = (int32_t)tele->mRaceState;
-
-  // Unfiltered Input
-  buf->unfiltered_throttle[i] = tele->mUnfilteredThrottle;
-  buf->unfiltered_brake[i] = tele->mUnfilteredBrake;
-  buf->unfiltered_steering[i] = tele->mUnfilteredSteering;
-  buf->unfiltered_clutch[i] = tele->mUnfilteredClutch;
-
-  // Timings
-  buf->best_lap_time[i] = tele->mBestLapTime;
-  buf->last_lap_time[i] = tele->mLastLapTime;
-  buf->current_time[i] = tele->mCurrentTime;
-
-  // Car State
-  buf->oil_temp[i] = tele->mOilTempCelsius;
-  buf->oil_pressure[i] = tele->mOilPressureKPa;
-  buf->water_temp[i] = tele->mWaterTempCelsius;
-  buf->water_pressure[i] = tele->mWaterPressureKPa;
-  buf->fuel_pressure[i] = tele->mFuelPressureKPa;
-  buf->fuel_level[i] = tele->mFuelLevel;
-  buf->fuel_capacity[i] = tele->mFuelCapacity;
-  buf->speed[i] = tele->mSpeed;
-  buf->rpm[i] = tele->mRpm;
-  buf->max_rpm[i] = tele->mMaxRPM;
-  buf->brake[i] = tele->mBrake;
-  buf->throttle[i] = tele->mThrottle;
-  buf->clutch[i] = tele->mClutch;
-  buf->steering[i] = tele->mSteering;
-  buf->gear[i] = tele->mGear;
-
-  // Motion
-  buf->orient_x[i] = tele->mOrientation[VEC_X];
-  buf->orient_y[i] = tele->mOrientation[VEC_Y];
-  buf->orient_z[i] = tele->mOrientation[VEC_Z];
-  buf->local_vel_x[i] = tele->mLocalVelocity[VEC_X];
-  buf->local_vel_y[i] = tele->mLocalVelocity[VEC_Y];
-  buf->local_vel_z[i] = tele->mLocalVelocity[VEC_Z];
-  buf->world_vel_x[i] = tele->mWorldVelocity[VEC_X];
-  buf->world_vel_y[i] = tele->mWorldVelocity[VEC_Y];
-  buf->world_vel_z[i] = tele->mWorldVelocity[VEC_Z];
-  buf->local_accel_x[i] = tele->mLocalAcceleration[VEC_X];
-  buf->local_accel_y[i] = tele->mLocalAcceleration[VEC_Y];
-  buf->local_accel_z[i] = tele->mLocalAcceleration[VEC_Z];
-  buf->world_accel_x[i] = tele->mWorldAcceleration[VEC_X];
-  buf->world_accel_y[i] = tele->mWorldAcceleration[VEC_Y];
-  buf->world_accel_z[i] = tele->mWorldAcceleration[VEC_Z];
-
-  // Wheels / Tyres
-  buf->tyre_temp_fl[i] = tele->mTyreTemp[TYRE_FRONT_LEFT];
-  buf->tyre_temp_fr[i] = tele->mTyreTemp[TYRE_FRONT_RIGHT];
-  buf->tyre_temp_rl[i] = tele->mTyreTemp[TYRE_REAR_LEFT];
-  buf->tyre_temp_rr[i] = tele->mTyreTemp[TYRE_REAR_RIGHT];
-  buf->tyre_wear_fl[i] = tele->mTyreWear[TYRE_FRONT_LEFT];
-  buf->tyre_wear_fr[i] = tele->mTyreWear[TYRE_FRONT_RIGHT];
-  buf->tyre_wear_rl[i] = tele->mTyreWear[TYRE_REAR_LEFT];
-  buf->tyre_wear_rr[i] = tele->mTyreWear[TYRE_REAR_RIGHT];
-  buf->brake_temp_fl[i] = tele->mBrakeTempCelsius[TYRE_FRONT_LEFT];
-  buf->brake_temp_fr[i] = tele->mBrakeTempCelsius[TYRE_FRONT_RIGHT];
-  buf->brake_temp_rl[i] = tele->mBrakeTempCelsius[TYRE_REAR_LEFT];
-  buf->brake_temp_rr[i] = tele->mBrakeTempCelsius[TYRE_REAR_RIGHT];
-
-  // Car Damage
-  buf->aero_damage[i] = tele->mAeroDamage;
-  buf->engine_damage[i] = tele->mEngineDamage;
-
-  // Weather
-  buf->ambient_temp[i] = tele->mAmbientTemperature;
-  buf->track_temp[i] = tele->mTrackTemperature;
-  buf->rain_density[i] = tele->mRainDensity;
-  buf->wind_speed[i] = tele->mWindSpeed;
-  buf->wind_dir_x[i] = tele->mWindDirectionX;
-  buf->wind_dir_y[i] = tele->mWindDirectionY;
-
-  // PCars2 additions
-  buf->susp_travel_fl[i] = tele->mSuspensionTravel[TYRE_FRONT_LEFT];
-  buf->susp_travel_fr[i] = tele->mSuspensionTravel[TYRE_FRONT_RIGHT];
-  buf->susp_travel_rl[i] = tele->mSuspensionTravel[TYRE_REAR_LEFT];
-  buf->susp_travel_rr[i] = tele->mSuspensionTravel[TYRE_REAR_RIGHT];
-  buf->air_pressure_fl[i] = tele->mAirPressure[TYRE_FRONT_LEFT];
-  buf->air_pressure_fr[i] = tele->mAirPressure[TYRE_FRONT_RIGHT];
-  buf->air_pressure_rl[i] = tele->mAirPressure[TYRE_REAR_LEFT];
-  buf->air_pressure_rr[i] = tele->mAirPressure[TYRE_REAR_RIGHT];
-  buf->engine_speed[i] = tele->mEngineSpeed;
-  buf->engine_torque[i] = tele->mEngineTorque;
-  buf->wing_front[i] = tele->mWings[0];
-  buf->wing_rear[i] = tele->mWings[1];
-  buf->handbrake[i] = tele->mHandBrake;
-
-  // More race variables
-  buf->brake_bias[i] = tele->mBrakeBias;
-
-  // AMS2 additions
-  buf->ride_height_fl[i] = tele->mRideHeight[TYRE_FRONT_LEFT];
-  buf->ride_height_fr[i] = tele->mRideHeight[TYRE_FRONT_RIGHT];
-  buf->ride_height_rl[i] = tele->mRideHeight[TYRE_REAR_LEFT];
-  buf->ride_height_rr[i] = tele->mRideHeight[TYRE_REAR_RIGHT];
+  for (size_t col = 0; col < NUM_COLUMNS; col++) {
+    void *dst = (uint8_t *)buf + columns[col].buf_offset + (size_t)i * columns[col].elem_size;
+    const void *src = (const uint8_t *)tele + columns[col].tele_offset;
+    memcpy(dst, src, columns[col].elem_size);
+  }
 }
 
 static void buffer_flush(row_buffer_t *buf, carquet_writer_t *writer) {
@@ -372,7 +256,7 @@ static void buffer_flush(row_buffer_t *buf, carquet_writer_t *writer) {
   }
 
   for (size_t col = 0; col < NUM_COLUMNS; col++) {
-    const void *data = (const uint8_t *)buf + columns[col].offset;
+    const void *data = (const uint8_t *)buf + columns[col].buf_offset;
     carquet_status_t st = carquet_writer_write_batch(writer, (int32_t)col, data, buf->count, NULL, NULL);
     if (st != CARQUET_OK) {
       fprintf(stderr, "Failed to write column '%s': %s\n", columns[col].name, carquet_status_string(st));
