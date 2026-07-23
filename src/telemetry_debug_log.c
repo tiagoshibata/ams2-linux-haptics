@@ -81,9 +81,8 @@ static const char *launch_stage_names[] = {
 static void print_participant_info(const ParticipantInfo *info) {
   printf("Name: %.64s IsActive: %d RacePosition: %u WorldPosition: [%.2f, %.2f, %.2f] Laps: Completed: %u Current: %u "
          "CurrentLapDistance: %.2f CurrentSector: %u\n",
-         info->mName, info->mIsActive, info->mRacePosition, info->mWorldPosition[0], info->mWorldPosition[1],
-         info->mWorldPosition[2], info->mLapsCompleted, info->mCurrentLap, info->mCurrentLapDistance,
-         info->mCurrentSector);
+         info->name, info->isActive, info->racePosition, info->worldPosition[0], info->worldPosition[1],
+         info->worldPosition[2], info->lapsCompleted, info->currentLap, info->currentLapDistance, info->currentSector);
 }
 
 static void print_float_array(const char *name, const float *arr, int len) {
@@ -127,136 +126,134 @@ static void print_terrain_array(const char *name, const Terrain *arr) {
 }
 
 void telemetry_debug_log(const ams2_telemetry *tele) {
-  printf("ProtocolVersion: %u  BuildVersionNumber: %u\n", tele->mVersion, tele->mBuildVersionNumber);
-  printf("GameState: %d (%s) SessionState: %d (%s) RaceState: %d (%s)\n", tele->mGameState,
-         game_state_names[tele->mGameState], tele->mSessionState, session_state_names[tele->mSessionState],
-         tele->mRaceState, race_state_names[tele->mRaceState]);
+  printf("ProtocolVersion: %u  BuildVersionNumber: %u\n", tele->version, tele->buildVersionNumber);
+  printf("GameState: %d (%s) SessionState: %d (%s) RaceState: %d (%s)\n", tele->gameState,
+         game_state_names[tele->gameState], tele->sessionState, session_state_names[tele->sessionState],
+         tele->raceState, race_state_names[tele->raceState]);
 
   printf("\nParticipants:\n");
-  printf("  ViewedParticipantIndex: %d\n", tele->mViewedParticipantIndex);
-  for (int i = 0; i < tele->mNumParticipants; i++) {
+  printf("  ViewedParticipantIndex: %d\n", tele->viewedParticipantIndex);
+  for (int i = 0; i < tele->numParticipants; i++) {
     printf("  Participant[%d]: ", i);
-    print_participant_info(&tele->mParticipantInfo[i]);
+    print_participant_info(&tele->participantInfo[i]);
   }
 
-  printf("\nUnfiltered Input: Throttle: %.2f  Brake: %.2f  Steering: %.2f  Clutch: %.2f\n", tele->mUnfilteredThrottle,
-         tele->mUnfilteredBrake, tele->mUnfilteredSteering, tele->mUnfilteredClutch);
+  printf("\nUnfiltered Input: Throttle: %.2f  Brake: %.2f  Steering: %.2f  Clutch: %.2f\n", tele->unfilteredThrottle,
+         tele->unfilteredBrake, tele->unfilteredSteering, tele->unfilteredClutch);
 
-  printf("\nCar Name: %.64s (class: %.64s)\n", tele->mCarName, tele->mCarClassName);
-  printf("Track: %.64s Variation: %.64s (%.2fkm) LapsInEvent: %u\n", tele->mTrackLocation, tele->mTrackVariation,
-         tele->mTrackLength, tele->mLapsInEvent);
+  printf("\nCar Name: %.64s (class: %.64s)\n", tele->carName, tele->carClassName);
+  printf("Track: %.64s Variation: %.64s (%.2fkm) LapsInEvent: %u\n", tele->trackLocation, tele->trackVariation,
+         tele->trackLength, tele->lapsInEvent);
 
   printf("\nTimings:\n");
-  printf("  NumSectors: %d LapInvalidated: %d\n", tele->mNumSectors, tele->mLapInvalidated);
-  printf("  LapTime: Best: %.3f Last: %.3f Current: %.3f PersonalFastest: %.3f WorldFastest: %.3f\n",
-         tele->mBestLapTime, tele->mLastLapTime, tele->mCurrentTime, tele->mPersonalFastestLapTime,
-         tele->mWorldFastestLapTime);
-  printf("  SplitTime: %.3f Ahead: %.3f Behind: %.3f EventTimeRemaining: %.3f\n", tele->mSplitTime,
-         tele->mSplitTimeAhead, tele->mSplitTimeBehind, tele->mEventTimeRemaining);
+  printf("  NumSectors: %d LapInvalidated: %d\n", tele->numSectors, tele->lapInvalidated);
+  printf("  LapTime: Best: %.3f Last: %.3f Current: %.3f PersonalFastest: %.3f WorldFastest: %.3f\n", tele->bestLapTime,
+         tele->lastLapTime, tele->currentTime, tele->personalFastestLapTime, tele->worldFastestLapTime);
+  printf("  SplitTime: %.3f Ahead: %.3f Behind: %.3f EventTimeRemaining: %.3f\n", tele->splitTime, tele->splitTimeAhead,
+         tele->splitTimeBehind, tele->eventTimeRemaining);
   printf("  SectorTime: Current: [%.3f, %.3f, %.3f] Fastest: [%.3f, %.3f, %.3f] PersonalFastest: [%.3f, %.3f, %.3f] "
          "WorldFastest: [%.3f, %.3f, %.3f]\n",
-         tele->mCurrentSector1Time, tele->mCurrentSector2Time, tele->mCurrentSector3Time, tele->mFastestSector1Time,
-         tele->mFastestSector2Time, tele->mFastestSector3Time, tele->mPersonalFastestSector1Time,
-         tele->mPersonalFastestSector2Time, tele->mPersonalFastestSector3Time, tele->mWorldFastestSector1Time,
-         tele->mWorldFastestSector2Time, tele->mWorldFastestSector3Time);
+         tele->currentSector1Time, tele->currentSector2Time, tele->currentSector3Time, tele->fastestSector1Time,
+         tele->fastestSector2Time, tele->fastestSector3Time, tele->personalFastestSector1Time,
+         tele->personalFastestSector2Time, tele->personalFastestSector3Time, tele->worldFastestSector1Time,
+         tele->worldFastestSector2Time, tele->worldFastestSector3Time);
 
-  printf("\nFlags: HighestFlagColour: %d (%s) Reason: %d\n", tele->mHighestFlagColour,
-         flag_colour_names[tele->mHighestFlagColour], tele->mHighestFlagReason);
+  printf("\nFlags: HighestFlagColour: %d (%s) Reason: %d\n", tele->highestFlagColour,
+         flag_colour_names[tele->highestFlagColour], tele->highestFlagReason);
 
-  printf("\nPit Info: Mode: %d (%s) Schedule: %d (%s)\n", tele->mPitMode, pit_mode_names[tele->mPitMode],
-         tele->mPitSchedule, pit_schedule_names[tele->mPitSchedule]);
+  printf("\nPit Info: Mode: %d (%s) Schedule: %d (%s)\n", tele->pitMode, pit_mode_names[tele->pitMode],
+         tele->pitSchedule, pit_schedule_names[tele->pitSchedule]);
 
   printf("\nCar State:\n");
-  printf("  CarFlags: 0x%08x\n", tele->mCarFlags);
-  printf("  Oil: Temp: %.2fC Pressure: %.2fKPa\n", tele->mOilTempCelsius, tele->mOilPressureKPa);
-  printf("  Water: Temp: %.2fC Pressure: %.2fKPa\n", tele->mWaterTempCelsius, tele->mWaterPressureKPa);
-  printf("  Fuel: %.2f/%.2f Pressure: %.2fKPa\n", tele->mFuelLevel, tele->mFuelCapacity, tele->mFuelPressureKPa);
-  printf("  Speed: %.2f m/s Rpm: %.0f/%.0f\n", tele->mSpeed, tele->mRpm, tele->mMaxRPM);
-  printf("  Brake: %.2f Throttle: %.2f Clutch: %.2f Steering: %.2f\n", tele->mBrake, tele->mThrottle, tele->mClutch,
-         tele->mSteering);
-  printf("  Gear: %d/%d\n", tele->mGear, tele->mNumGears);
-  printf("  OdometerKM: %.2f\n", tele->mOdometerKM);
-  printf("  AntiLockActive: %d\n", tele->mAntiLockActive);
-  printf("  LastOpponentCollisionIndex: %d Magnitude: %.2f\n", tele->mLastOpponentCollisionIndex,
-         tele->mLastOpponentCollisionMagnitude);
-  printf("  Boost: Active: %d Amount: %.2f\n", tele->mBoostActive, tele->mBoostAmount);
+  printf("  CarFlags: 0x%08x\n", tele->carFlags);
+  printf("  Oil: Temp: %.2fC Pressure: %.2fKPa\n", tele->oilTempCelsius, tele->oilPressureKPa);
+  printf("  Water: Temp: %.2fC Pressure: %.2fKPa\n", tele->waterTempCelsius, tele->waterPressureKPa);
+  printf("  Fuel: %.2f/%.2f Pressure: %.2fKPa\n", tele->fuelLevel, tele->fuelCapacity, tele->fuelPressureKPa);
+  printf("  Speed: %.2f m/s Rpm: %.0f/%.0f\n", tele->speed, tele->rpm, tele->maxRPM);
+  printf("  Brake: %.2f Throttle: %.2f Clutch: %.2f Steering: %.2f\n", tele->brake, tele->throttle, tele->clutch,
+         tele->steering);
+  printf("  Gear: %d/%d\n", tele->gear, tele->numGears);
+  printf("  OdometerKM: %.2f\n", tele->odometerKM);
+  printf("  AntiLockActive: %d\n", tele->antiLockActive);
+  printf("  LastOpponentCollisionIndex: %d Magnitude: %.2f\n", tele->lastOpponentCollisionIndex,
+         tele->lastOpponentCollisionMagnitude);
+  printf("  Boost: Active: %d Amount: %.2f\n", tele->boostActive, tele->boostAmount);
 
   printf("\nMotion:\n");
-  print_float_array("Orientation", tele->mOrientation, VEC_MAX);
-  print_float_array("LocalVelocity", tele->mLocalVelocity, VEC_MAX);
-  print_float_array("WorldVelocity", tele->mWorldVelocity, VEC_MAX);
-  print_float_array("AngularVelocity", tele->mAngularVelocity, VEC_MAX);
-  print_float_array("LocalAcceleration", tele->mLocalAcceleration, VEC_MAX);
-  print_float_array("WorldAcceleration", tele->mWorldAcceleration, VEC_MAX);
-  print_float_array("ExtentsCentre", tele->mExtentsCentre, VEC_MAX);
+  print_float_array("Orientation", tele->orientation, VEC_MAX);
+  print_float_array("LocalVelocity", tele->localVelocity, VEC_MAX);
+  print_float_array("WorldVelocity", tele->worldVelocity, VEC_MAX);
+  print_float_array("AngularVelocity", tele->angularVelocity, VEC_MAX);
+  print_float_array("LocalAcceleration", tele->localAcceleration, VEC_MAX);
+  print_float_array("WorldAcceleration", tele->worldAcceleration, VEC_MAX);
+  print_float_array("ExtentsCentre", tele->extentsCentre, VEC_MAX);
 
   printf("\nWheels / Tyres:\n");
-  print_tyre_flags_array("TyreFlags", tele->mTyreFlags);
-  print_terrain_array("TyreTerrain", tele->mTyreTerrain);
-  print_tyre_array("TyreY", tele->mTyreY);
-  print_tyre_array("TyreRPS", tele->mTyreRPS);
-  print_tyre_array("TyreSlipSpeed", tele->mTyreSlipSpeed);
-  print_tyre_array("TyreTemp", tele->mTyreTemp);
-  print_tyre_array("TyreGrip", tele->mTyreGrip);
-  print_tyre_array("TyreHeightAboveGround", tele->mTyreHeightAboveGround);
-  print_tyre_array("TyreLateralStiffness", tele->mTyreLateralStiffness);
-  print_tyre_array("TyreWear", tele->mTyreWear);
-  print_tyre_array("BrakeDamage", tele->mBrakeDamage);
-  print_tyre_array("SuspensionDamage", tele->mSuspensionDamage);
-  print_tyre_array("BrakeTempCelsius", tele->mBrakeTempCelsius);
-  print_tyre_array("TyreTreadTemp", tele->mTyreTreadTemp);
-  print_tyre_array("TyreLayerTemp", tele->mTyreLayerTemp);
-  print_tyre_array("TyreCarcassTemp", tele->mTyreCarcassTemp);
-  print_tyre_array("TyreRimTemp", tele->mTyreRimTemp);
-  print_tyre_array("TyreInternalAirTemp", tele->mTyreInternalAirTemp);
+  print_tyre_flags_array("TyreFlags", tele->tyreFlags);
+  print_terrain_array("TyreTerrain", tele->tyreTerrain);
+  print_tyre_array("TyreY", tele->tyreY);
+  print_tyre_array("TyreRPS", tele->tyreRPS);
+  print_tyre_array("TyreSlipSpeed", tele->tyreSlipSpeed);
+  print_tyre_array("TyreTemp", tele->tyreTemp);
+  print_tyre_array("TyreGrip", tele->tyreGrip);
+  print_tyre_array("TyreHeightAboveGround", tele->tyreHeightAboveGround);
+  print_tyre_array("TyreLateralStiffness", tele->tyreLateralStiffness);
+  print_tyre_array("TyreWear", tele->tyreWear);
+  print_tyre_array("BrakeDamage", tele->brakeDamage);
+  print_tyre_array("SuspensionDamage", tele->suspensionDamage);
+  print_tyre_array("BrakeTempCelsius", tele->brakeTempCelsius);
+  print_tyre_array("TyreTreadTemp", tele->tyreTreadTemp);
+  print_tyre_array("TyreLayerTemp", tele->tyreLayerTemp);
+  print_tyre_array("TyreCarcassTemp", tele->tyreCarcassTemp);
+  print_tyre_array("TyreRimTemp", tele->tyreRimTemp);
+  print_tyre_array("TyreInternalAirTemp", tele->tyreInternalAirTemp);
 
-  printf("\nCar Damage: CrashState: %d (%s) AeroDamage: %.2f EngineDamage: %.2f\n", tele->mCrashState,
-         crash_damage_names[tele->mCrashState], tele->mAeroDamage, tele->mEngineDamage);
+  printf("\nCar Damage: CrashState: %d (%s) AeroDamage: %.2f EngineDamage: %.2f\n", tele->crashState,
+         crash_damage_names[tele->crashState], tele->aeroDamage, tele->engineDamage);
 
   printf("\nWeather:\n");
-  printf("  Temperature: Ambient: %.2fC Track: %.2fC\n", tele->mAmbientTemperature, tele->mTrackTemperature);
-  printf("  RainDensity: %.2f\n", tele->mRainDensity);
-  printf("  Wind: Speed: %.2f Direction: [%.2f, %.2f]\n", tele->mWindSpeed, tele->mWindDirectionX,
-         tele->mWindDirectionY);
-  printf("  CloudBrightness: %.2f\n", tele->mCloudBrightness);
+  printf("  Temperature: Ambient: %.2fC Track: %.2fC\n", tele->ambientTemperature, tele->trackTemperature);
+  printf("  RainDensity: %.2f\n", tele->rainDensity);
+  printf("  Wind: Speed: %.2f Direction: [%.2f, %.2f]\n", tele->windSpeed, tele->windDirectionX, tele->windDirectionY);
+  printf("  CloudBrightness: %.2f\n", tele->cloudBrightness);
 
-  printf("\nSequenceNumber: %u\n", tele->mSequenceNumber);
+  printf("\nSequenceNumber: %u\n", tele->sequenceNumber);
 
   printf("\nAdditional Car Variables:\n");
-  print_tyre_array("WheelLocalPositionY", tele->mWheelLocalPositionY);
-  print_tyre_array("SuspensionTravel", tele->mSuspensionTravel);
-  print_tyre_array("SuspensionVelocity", tele->mSuspensionVelocity);
-  print_tyre_array("AirPressure", tele->mAirPressure);
-  printf("  EngineSpeed: %.2f rad/s EngineTorque: %.2f Nm\n", tele->mEngineSpeed, tele->mEngineTorque);
-  printf("  Wings: [%.2f, %.2f]\n", tele->mWings[0], tele->mWings[1]);
-  printf("  HandBrake: %.2f\n", tele->mHandBrake);
+  print_tyre_array("WheelLocalPositionY", tele->wheelLocalPositionY);
+  print_tyre_array("SuspensionTravel", tele->suspensionTravel);
+  print_tyre_array("SuspensionVelocity", tele->suspensionVelocity);
+  print_tyre_array("AirPressure", tele->airPressure);
+  printf("  EngineSpeed: %.2f rad/s EngineTorque: %.2f Nm\n", tele->engineSpeed, tele->engineTorque);
+  printf("  Wings: [%.2f, %.2f]\n", tele->wings[0], tele->wings[1]);
+  printf("  HandBrake: %.2f\n", tele->handBrake);
 
   printf("\nRace Variables:\n");
-  printf("  EnforcedPitStopLap: %d\n", tele->mEnforcedPitStopLap);
-  printf("  TranslatedTrack: Location: %.64s Variation: %.64s\n", tele->mTranslatedTrackLocation,
-         tele->mTranslatedTrackVariation);
-  printf("  BrakeBias: %.2f TurboBoostPressure: %.2f\n", tele->mBrakeBias, tele->mTurboBoostPressure);
-  printf("  SnowDensity: %.2f\n", tele->mSnowDensity);
-  printf("  Session: Duration: %.2fmin AdditionalLaps: %d\n", tele->mSessionDuration, tele->mSessionAdditionalLaps);
+  printf("  EnforcedPitStopLap: %d\n", tele->enforcedPitStopLap);
+  printf("  TranslatedTrack: Location: %.64s Variation: %.64s\n", tele->translatedTrackLocation,
+         tele->translatedTrackVariation);
+  printf("  BrakeBias: %.2f TurboBoostPressure: %.2f\n", tele->brakeBias, tele->turboBoostPressure);
+  printf("  SnowDensity: %.2f\n", tele->snowDensity);
+  printf("  Session: Duration: %.2fmin AdditionalLaps: %d\n", tele->sessionDuration, tele->sessionAdditionalLaps);
 
   printf("\nTyres:\n");
-  print_tyre_array("TempLeft", tele->mTyreTempLeft);
-  print_tyre_array("TempCenter", tele->mTyreTempCenter);
-  print_tyre_array("TempRight", tele->mTyreTempRight);
-  print_tyre_array("RideHeight", tele->mRideHeight);
+  print_tyre_array("TempLeft", tele->tyreTempLeft);
+  print_tyre_array("TempCenter", tele->tyreTempCenter);
+  print_tyre_array("TempRight", tele->tyreTempRight);
+  print_tyre_array("RideHeight", tele->rideHeight);
 
-  printf("\nDRSState: 0x%08x\n", tele->mDrsState);
+  printf("\nDRSState: 0x%08x\n", tele->drsState);
 
-  printf("\nInput: JoyPad0: 0x%08x DPad: 0x%08x AntiLockSetting: %d TractionControlSetting: %d\n", tele->mJoyPad0,
-         tele->mDPad, tele->mAntiLockSetting, tele->mTractionControlSetting);
+  printf("\nInput: JoyPad0: 0x%08x DPad: 0x%08x AntiLockSetting: %d TractionControlSetting: %d\n", tele->joyPad0,
+         tele->dPad, tele->antiLockSetting, tele->tractionControlSetting);
 
-  printf("\nERS: DeploymentMode: %d (%s) AutoModeEnabled: %d\n", tele->mErsDeploymentMode,
-         ers_deployment_names[tele->mErsDeploymentMode], tele->mErsAutoModeEnabled);
+  printf("\nERS: DeploymentMode: %d (%s) AutoModeEnabled: %d\n", tele->ersDeploymentMode,
+         ers_deployment_names[tele->ersDeploymentMode], tele->ersAutoModeEnabled);
 
-  printf("\nClutch: Temp: %.2fK Wear: %.2f Overheated: %d Slipping: %d\n", tele->mClutchTemp, tele->mClutchWear,
-         tele->mClutchOverheated, tele->mClutchSlipping);
+  printf("\nClutch: Temp: %.2fK Wear: %.2f Overheated: %d Slipping: %d\n", tele->clutchTemp, tele->clutchWear,
+         tele->clutchOverheated, tele->clutchSlipping);
 
-  printf("\nSession: YellowFlagState: %d (%s) SessionIsPrivate: %d LaunchStage: %d (%s)\n", tele->mYellowFlagState,
-         yellow_flag_state_names[tele->mYellowFlagState + 1], tele->mSessionIsPrivate, tele->mLaunchStage,
-         launch_stage_names[tele->mLaunchStage + 1]);
+  printf("\nSession: YellowFlagState: %d (%s) SessionIsPrivate: %d LaunchStage: %d (%s)\n", tele->yellowFlagState,
+         yellow_flag_state_names[tele->yellowFlagState + 1], tele->sessionIsPrivate, tele->launchStage,
+         launch_stage_names[tele->launchStage + 1]);
 }

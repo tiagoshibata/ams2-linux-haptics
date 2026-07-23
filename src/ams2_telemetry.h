@@ -199,14 +199,14 @@ typedef enum : int32_t {
 } CrashDamage;
 
 typedef struct {
-  bool mIsActive;
-  char mName[STRING_LENGTH_MAX]; // [ string ]
-  float mWorldPosition[VEC_MAX]; // [ UNITS = World Space ]
-  float mCurrentLapDistance;     // [ UNITS = Metres ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  unsigned mRacePosition;        // [ RANGE = 1->... ] [ UNSET = 0 ]
-  unsigned mLapsCompleted;       // [ RANGE = 0->... ] [ UNSET = 0 ]
-  unsigned mCurrentLap;          // [ RANGE = 0->... ] [ UNSET = 0 ]
-  int mCurrentSector;            // [ RANGE = 0->... ] [ UNSET = -1 ]
+  bool isActive;
+  char name[STRING_LENGTH_MAX]; // [ string ]
+  float worldPosition[VEC_MAX]; // [ UNITS = World Space ]
+  float currentLapDistance;     // [ UNITS = Metres ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned racePosition;        // [ RANGE = 1->... ] [ UNSET = 0 ]
+  unsigned lapsCompleted;       // [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned currentLap;          // [ RANGE = 0->... ] [ UNSET = 0 ]
+  int currentSector;            // [ RANGE = 0->... ] [ UNSET = -1 ]
 } ParticipantInfo;
 
 typedef enum : int32_t {
@@ -250,222 +250,220 @@ typedef enum : int32_t {
 
 typedef struct {
   // Version Number
-  unsigned mVersion;            // [ RANGE = 0->... ]
-  unsigned mBuildVersionNumber; // [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned version;            // [ RANGE = 0->... ]
+  unsigned buildVersionNumber; // [ RANGE = 0->... ] [ UNSET = 0 ]
 
   // Game States
-  GameState mGameState;
-  SessionState mSessionState;
-  RaceState mRaceState;
+  GameState gameState;
+  SessionState sessionState;
+  RaceState raceState;
 
   // Participant Info
-  int mViewedParticipantIndex; // [ RANGE = 0->STORED_PARTICIPANTS_MAX ] [ UNSET = -1 ]
-  int mNumParticipants;        // [ RANGE = 0->STORED_PARTICIPANTS_MAX ] [ UNSET = -1 ]
-  ParticipantInfo mParticipantInfo[STORED_PARTICIPANTS_MAX];
+  int viewedParticipantIndex; // [ RANGE = 0->STORED_PARTICIPANTS_MAX ] [ UNSET = -1 ]
+  int numParticipants;        // [ RANGE = 0->STORED_PARTICIPANTS_MAX ] [ UNSET = -1 ]
+  ParticipantInfo participantInfo[STORED_PARTICIPANTS_MAX];
 
   // Unfiltered Input
-  float mUnfilteredThrottle; // [ RANGE = 0->1 ]
-  float mUnfilteredBrake;    // [ RANGE = 0->1 ]
-  float mUnfilteredSteering; // [ RANGE = -1->1 ]
-  float mUnfilteredClutch;   // [ RANGE = 0->1 ]
+  float unfilteredThrottle; // [ RANGE = 0->1 ]
+  float unfilteredBrake;    // [ RANGE = 0->1 ]
+  float unfilteredSteering; // [ RANGE = -1->1 ]
+  float unfilteredClutch;   // [ RANGE = 0->1 ]
 
   // Vehicle information
-  char mCarName[STRING_LENGTH_MAX];      // [ string ]
-  char mCarClassName[STRING_LENGTH_MAX]; // [ string ]
+  char carName[STRING_LENGTH_MAX];      // [ string ]
+  char carClassName[STRING_LENGTH_MAX]; // [ string ]
 
   // Event information
-  unsigned mLapsInEvent;                   // [ RANGE = 0->... ] [ UNSET = 0 ]
-  char mTrackLocation[STRING_LENGTH_MAX];  // [ string ] - untranslated shortened English name
-  char mTrackVariation[STRING_LENGTH_MAX]; // [ string ] - untranslated shortened English variation
-  float mTrackLength;                      // [ UNITS = Metres ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  unsigned lapsInEvent;                   // [ RANGE = 0->... ] [ UNSET = 0 ]
+  char trackLocation[STRING_LENGTH_MAX];  // [ string ] - untranslated shortened English name
+  char trackVariation[STRING_LENGTH_MAX]; // [ string ] - untranslated shortened English variation
+  float trackLength;                      // [ UNITS = Metres ] [ RANGE = 0->... ] [ UNSET = 0 ]
 
   // Timings
-  int mNumSectors;                   // [ RANGE = 0->... ] [ UNSET = -1 ]
-  bool mLapInvalidated;              // [ UNSET = false ]
-  float mBestLapTime;                // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mLastLapTime;                // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mCurrentTime;                // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mSplitTimeAhead;             // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mSplitTimeBehind;            // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mSplitTime;                  // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mEventTimeRemaining;         // [ UNITS = milli-seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mPersonalFastestLapTime;     // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mWorldFastestLapTime;        // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mCurrentSector1Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mCurrentSector2Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mCurrentSector3Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mFastestSector1Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mFastestSector2Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mFastestSector3Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mPersonalFastestSector1Time; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mPersonalFastestSector2Time; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mPersonalFastestSector3Time; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mWorldFastestSector1Time;    // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mWorldFastestSector2Time;    // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mWorldFastestSector3Time;    // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  int numSectors;                   // [ RANGE = 0->... ] [ UNSET = -1 ]
+  bool lapInvalidated;              // [ UNSET = false ]
+  float bestLapTime;                // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float lastLapTime;                // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float currentTime;                // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float splitTimeAhead;             // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float splitTimeBehind;            // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float splitTime;                  // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float eventTimeRemaining;         // [ UNITS = milli-seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float personalFastestLapTime;     // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float worldFastestLapTime;        // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float currentSector1Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float currentSector2Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float currentSector3Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float fastestSector1Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float fastestSector2Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float fastestSector3Time;         // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float personalFastestSector1Time; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float personalFastestSector2Time; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float personalFastestSector3Time; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float worldFastestSector1Time;    // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float worldFastestSector2Time;    // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float worldFastestSector3Time;    // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
 
   // Flags
-  FlagColour mHighestFlagColour;
-  FlagReason mHighestFlagReason;
+  FlagColour highestFlagColour;
+  FlagReason highestFlagReason;
 
   // Pit Info
-  PitMode mPitMode;
-  PitSchedule mPitSchedule;
+  PitMode pitMode;
+  PitSchedule pitSchedule;
 
   // Car State
-  CarFlags mCarFlags;
-  float mOilTempCelsius;                 // [ UNITS = Celsius ] [ UNSET = 0 ]
-  float mOilPressureKPa;                 // [ UNITS = Kilopascal ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mWaterTempCelsius;               // [ UNITS = Celsius ] [ UNSET = 0 ]
-  float mWaterPressureKPa;               // [ UNITS = Kilopascal ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mFuelPressureKPa;                // [ UNITS = Kilopascal ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mFuelLevel;                      // [ RANGE = 0->1 ]
-  float mFuelCapacity;                   // [ UNITS = Liters ] [ RANGE = 0->1 ] [ UNSET = 0 ]
-  float mSpeed;                          // [ UNITS = Metres per-second ] [ RANGE = 0->... ]
-  float mRpm;                            // [ UNITS = Revolutions per minute ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mMaxRPM;                         // [ UNITS = Revolutions per minute ] [ RANGE = 0->... ] [ UNSET = 0 ]
-  float mBrake;                          // [ RANGE = 0->1 ]
-  float mThrottle;                       // [ RANGE = 0->1 ]
-  float mClutch;                         // [ RANGE = 0->1 ]
-  float mSteering;                       // [ RANGE = -1->1 ]
-  int mGear;                             // [ RANGE = -1 (Reverse)  0 (Neutral)  1  2 ... ] [ UNSET = 0 ]
-  int mNumGears;                         // [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mOdometerKM;                     // [ RANGE = 0->... ] [ UNSET = -1 ]
-  bool mAntiLockActive;                  // [ UNSET = false ]
-  int mLastOpponentCollisionIndex;       // [ RANGE = 0->STORED_PARTICIPANTS_MAX ] [ UNSET = -1 ]
-  float mLastOpponentCollisionMagnitude; // [ RANGE = 0->... ]
-  bool mBoostActive;                     // [ UNSET = false ]
-  float mBoostAmount;                    // [ RANGE = 0->100 ]
+  CarFlags carFlags;
+  float oilTempCelsius;                 // [ UNITS = Celsius ] [ UNSET = 0 ]
+  float oilPressureKPa;                 // [ UNITS = Kilopascal ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float waterTempCelsius;               // [ UNITS = Celsius ] [ UNSET = 0 ]
+  float waterPressureKPa;               // [ UNITS = Kilopascal ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float fuelPressureKPa;                // [ UNITS = Kilopascal ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float fuelLevel;                      // [ RANGE = 0->1 ]
+  float fuelCapacity;                   // [ UNITS = Liters ] [ RANGE = 0->1 ] [ UNSET = 0 ]
+  float speed;                          // [ UNITS = Metres per-second ] [ RANGE = 0->... ]
+  float rpm;                            // [ UNITS = Revolutions per minute ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float maxRPM;                         // [ UNITS = Revolutions per minute ] [ RANGE = 0->... ] [ UNSET = 0 ]
+  float brake;                          // [ RANGE = 0->1 ]
+  float throttle;                       // [ RANGE = 0->1 ]
+  float clutch;                         // [ RANGE = 0->1 ]
+  float steering;                       // [ RANGE = -1->1 ]
+  int gear;                             // [ RANGE = -1 (Reverse)  0 (Neutral)  1  2 ... ] [ UNSET = 0 ]
+  int numGears;                         // [ RANGE = 0->... ] [ UNSET = -1 ]
+  float odometerKM;                     // [ RANGE = 0->... ] [ UNSET = -1 ]
+  bool antiLockActive;                  // [ UNSET = false ]
+  int lastOpponentCollisionIndex;       // [ RANGE = 0->STORED_PARTICIPANTS_MAX ] [ UNSET = -1 ]
+  float lastOpponentCollisionMagnitude; // [ RANGE = 0->... ]
+  bool boostActive;                     // [ UNSET = false ]
+  float boostAmount;                    // [ RANGE = 0->100 ]
 
   // Motion & Device Related
-  float mOrientation[VEC_MAX];       // [ UNITS = Euler Angles ]
-  float mLocalVelocity[VEC_MAX];     // [ UNITS = Metres per-second ]
-  float mWorldVelocity[VEC_MAX];     // [ UNITS = Metres per-second ]
-  float mAngularVelocity[VEC_MAX];   // [ UNITS = Radians per-second ]
-  float mLocalAcceleration[VEC_MAX]; // [ UNITS = Metres per-second ]
-  float mWorldAcceleration[VEC_MAX]; // [ UNITS = Metres per-second ]
-  float mExtentsCentre[VEC_MAX];     // [ UNITS = Local Space  X  Y  Z ]
+  float orientation[VEC_MAX];       // [ UNITS = Euler Angles ]
+  float localVelocity[VEC_MAX];     // [ UNITS = Metres per-second ]
+  float worldVelocity[VEC_MAX];     // [ UNITS = Metres per-second ]
+  float angularVelocity[VEC_MAX];   // [ UNITS = Radians per-second ]
+  float localAcceleration[VEC_MAX]; // [ UNITS = Metres per-second ]
+  float worldAcceleration[VEC_MAX]; // [ UNITS = Metres per-second ]
+  float extentsCentre[VEC_MAX];     // [ UNITS = Local Space  X  Y  Z ]
 
   // Wheels / Tyres
-  TyreFlags mTyreFlags[TYRE_MAX];
-  Terrain mTyreTerrain[TYRE_MAX];
-  float mTyreY[TYRE_MAX];                 // [ UNITS = Local Space  Y ]
-  float mTyreRPS[TYRE_MAX];               // [ UNITS = Revolutions per second ]
-  float mTyreSlipSpeed[TYRE_MAX];         // OBSOLETE, kept for backward compatibility only
-  float mTyreTemp[TYRE_MAX];              // [ UNITS = Celsius ] [ UNSET = 0 ]
-  float mTyreGrip[TYRE_MAX];              // OBSOLETE, kept for backward compatibility only
-  float mTyreHeightAboveGround[TYRE_MAX]; // [ UNITS = Local Space  Y ]
-  float mTyreLateralStiffness[TYRE_MAX];  // OBSOLETE, kept for backward compatibility only
-  float mTyreWear[TYRE_MAX];              // [ RANGE = 0->1 ]
-  float mBrakeDamage[TYRE_MAX];           // [ RANGE = 0->1 ]
-  float mSuspensionDamage[TYRE_MAX];      // [ RANGE = 0->1 ]
-  float mBrakeTempCelsius[TYRE_MAX];      // [ UNITS = Celsius ]
-  float mTyreTreadTemp[TYRE_MAX];         // [ UNITS = Kelvin ]
-  float mTyreLayerTemp[TYRE_MAX];         // [ UNITS = Kelvin ]
-  float mTyreCarcassTemp[TYRE_MAX];       // [ UNITS = Kelvin ]
-  float mTyreRimTemp[TYRE_MAX];           // [ UNITS = Kelvin ]
-  float mTyreInternalAirTemp[TYRE_MAX];   // [ UNITS = Kelvin ]
+  TyreFlags tyreFlags[TYRE_MAX];
+  Terrain tyreTerrain[TYRE_MAX];
+  float tyreY[TYRE_MAX];                 // [ UNITS = Local Space  Y ]
+  float tyreRPS[TYRE_MAX];               // [ UNITS = Revolutions per second ]
+  float tyreSlipSpeed[TYRE_MAX];         // OBSOLETE, kept for backward compatibility only
+  float tyreTemp[TYRE_MAX];              // [ UNITS = Celsius ] [ UNSET = 0 ]
+  float tyreGrip[TYRE_MAX];              // OBSOLETE, kept for backward compatibility only
+  float tyreHeightAboveGround[TYRE_MAX]; // [ UNITS = Local Space  Y ]
+  float tyreLateralStiffness[TYRE_MAX];  // OBSOLETE, kept for backward compatibility only
+  float tyreWear[TYRE_MAX];              // [ RANGE = 0->1 ]
+  float brakeDamage[TYRE_MAX];           // [ RANGE = 0->1 ]
+  float suspensionDamage[TYRE_MAX];      // [ RANGE = 0->1 ]
+  float brakeTempCelsius[TYRE_MAX];      // [ UNITS = Celsius ]
+  float tyreTreadTemp[TYRE_MAX];         // [ UNITS = Kelvin ]
+  float tyreLayerTemp[TYRE_MAX];         // [ UNITS = Kelvin ]
+  float tyreCarcassTemp[TYRE_MAX];       // [ UNITS = Kelvin ]
+  float tyreRimTemp[TYRE_MAX];           // [ UNITS = Kelvin ]
+  float tyreInternalAirTemp[TYRE_MAX];   // [ UNITS = Kelvin ]
 
   // Car Damage
-  CrashDamage mCrashState;
-  float mAeroDamage;   // [ RANGE = 0->1 ]
-  float mEngineDamage; // [ RANGE = 0->1 ]
+  CrashDamage crashState;
+  float aeroDamage;   // [ RANGE = 0->1 ]
+  float engineDamage; // [ RANGE = 0->1 ]
 
   // Weather
-  float mAmbientTemperature; // [ UNITS = Celsius ] [ UNSET = 25 ]
-  float mTrackTemperature;   // [ UNITS = Celsius ] [ UNSET = 30 ]
-  float mRainDensity;        // [ UNITS = How much rain will fall ] [ RANGE = 0->1 ]
-  float mWindSpeed;          // [ RANGE = 0->100 ] [ UNSET = 2 ]
-  float mWindDirectionX;     // [ UNITS = Normalised Vector X ]
-  float mWindDirectionY;     // [ UNITS = Normalised Vector Y ]
-  float mCloudBrightness;    // [ RANGE = 0->... ]
+  float ambientTemperature; // [ UNITS = Celsius ] [ UNSET = 25 ]
+  float trackTemperature;   // [ UNITS = Celsius ] [ UNSET = 30 ]
+  float rainDensity;        // [ UNITS = How much rain will fall ] [ RANGE = 0->1 ]
+  float windSpeed;          // [ RANGE = 0->100 ] [ UNSET = 2 ]
+  float windDirectionX;     // [ UNITS = Normalised Vector X ]
+  float windDirectionY;     // [ UNITS = Normalised Vector Y ]
+  float cloudBrightness;    // [ RANGE = 0->... ]
 
   // PCars2 additions start, version 8
   // Sequence Number to help slightly with data integrity reads
-  volatile unsigned mSequenceNumber; // 0 at the start, incremented at start and end of writing, so odd when Shared
-                                     // Memory is being filled, even when the memory is not being touched
+  volatile unsigned sequenceNumber; // 0 at the start, incremented at start and end of writing, so odd when Shared
+                                    // Memory is being filled, even when the memory is not being touched
 
   // Additional car variables
-  float mWheelLocalPositionY[TYRE_MAX]; // [ UNITS = Local Space Y ]
-  float mSuspensionTravel[TYRE_MAX];    // [ UNITS = meters ] [ RANGE 0 =>... ] [ UNSET = 0 ]
-  float
-      mSuspensionVelocity[TYRE_MAX]; // [ UNITS = Rate of change of pushrod deflection ] [ RANGE 0 =>... ] [ UNSET = 0 ]
-  float mAirPressure[TYRE_MAX];      // [ UNITS = PSI ]  [ RANGE 0 =>... ]  [ UNSET = 0 ]
-  float mEngineSpeed;                // [ UNITS = Rad/s ] [UNSET = 0 ]
-  float mEngineTorque;               // [ UNITS = Newton Meters] [UNSET = 0 ] [ RANGE = 0->... ]
-  float mWings[2];                   // [ RANGE = 0->1 ] [UNSET = 0 ]
-  float mHandBrake;                  // [ RANGE = 0->1 ] [UNSET = 0 ]
+  float wheelLocalPositionY[TYRE_MAX]; // [ UNITS = Local Space Y ]
+  float suspensionTravel[TYRE_MAX];    // [ UNITS = meters ] [ RANGE 0 =>... ] [ UNSET = 0 ]
+  float suspensionVelocity[TYRE_MAX];  // [ UNITS = Rate of change of pushrod deflection ] [ RANGE 0 =>... ]
+  float airPressure[TYRE_MAX];         // [ UNITS = PSI ]  [ RANGE 0 =>... ]  [ UNSET = 0 ]
+  float engineSpeed;                   // [ UNITS = Rad/s ] [UNSET = 0 ]
+  float engineTorque;                  // [ UNITS = Newton Meters] [UNSET = 0 ] [ RANGE = 0->... ]
+  float wings[2];                      // [ RANGE = 0->1 ] [UNSET = 0 ]
+  float handBrake;                     // [ RANGE = 0->1 ] [UNSET = 0 ]
 
   // additional race variables
-  float mCurrentSector1Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mCurrentSector2Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mCurrentSector3Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mFastestSector1Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mFastestSector2Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mFastestSector3Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mFastestLapTimes[STORED_PARTICIPANTS_MAX];     // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  float mLastLapTimes[STORED_PARTICIPANTS_MAX];        // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
-  bool mLapsInvalidated[STORED_PARTICIPANTS_MAX];      // [ UNITS = boolean per participant ] [ UNSET = false ]
-  RaceState mRaceStates[STORED_PARTICIPANTS_MAX];
-  PitMode mPitModes[STORED_PARTICIPANTS_MAX];
-  float mOrientations[STORED_PARTICIPANTS_MAX][VEC_MAX];           // [ UNITS = Euler Angles ]
-  float mSpeeds[STORED_PARTICIPANTS_MAX];                          // [ UNITS = Metres per-second ] [ RANGE = 0->... ]
-  char mCarNames[STORED_PARTICIPANTS_MAX][STRING_LENGTH_MAX];      // [ string ]
-  char mCarClassNames[STORED_PARTICIPANTS_MAX][STRING_LENGTH_MAX]; // [ string ]
+  float currentSector1Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float currentSector2Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float currentSector3Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float fastestSector1Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float fastestSector2Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float fastestSector3Times[STORED_PARTICIPANTS_MAX]; // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float fastestLapTimes[STORED_PARTICIPANTS_MAX];     // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  float lastLapTimes[STORED_PARTICIPANTS_MAX];        // [ UNITS = seconds ] [ RANGE = 0->... ] [ UNSET = -1 ]
+  bool lapsInvalidated[STORED_PARTICIPANTS_MAX];      // [ UNITS = boolean per participant ] [ UNSET = false ]
+  RaceState raceStates[STORED_PARTICIPANTS_MAX];
+  PitMode pitModes[STORED_PARTICIPANTS_MAX];
+  float orientations[STORED_PARTICIPANTS_MAX][VEC_MAX];           // [ UNITS = Euler Angles ]
+  float speeds[STORED_PARTICIPANTS_MAX];                          // [ UNITS = Metres per-second ] [ RANGE = 0->... ]
+  char carNames[STORED_PARTICIPANTS_MAX][STRING_LENGTH_MAX];      // [ string ]
+  char carClassNames[STORED_PARTICIPANTS_MAX][STRING_LENGTH_MAX]; // [ string ]
 
   // additional race variables
-  int mEnforcedPitStopLap; // [ UNITS = in which lap is a mandatory pitstop] [ RANGE = 0->... ] [ UNSET = -1 ]
-  char mTranslatedTrackLocation[STRING_LENGTH_MAX];            // [ string ]
-  char mTranslatedTrackVariation[STRING_LENGTH_MAX];           // [ string ]
-  float mBrakeBias;                                            // [ RANGE = 0->1... ] [ UNSET = -1 ]
-  float mTurboBoostPressure;                                   // [ RANGE = 0->1... ] [ UNSET = -1 ]
-  char mTyreCompound[TYRE_MAX][TYRE_COMPOUND_NAME_LENGTH_MAX]; // [ strings  ]
-  PitSchedule mPitSchedules[STORED_PARTICIPANTS_MAX];
-  FlagColour mHighestFlagColours[STORED_PARTICIPANTS_MAX];
-  FlagReason mHighestFlagReasons[STORED_PARTICIPANTS_MAX];
-  unsigned mNationalities[STORED_PARTICIPANTS_MAX]; // [ nationality table, SP AND UNSET = 0 ]
-  float mSnowDensity; // [ UNITS = How much snow will fall ] [ RANGE = 0->1 ] non zero only in Winter and Snow seasons
+  int enforcedPitStopLap; // [ UNITS = in which lap is a mandatory pitstop] [ RANGE = 0->... ] [ UNSET = -1 ]
+  char translatedTrackLocation[STRING_LENGTH_MAX];            // [ string ]
+  char translatedTrackVariation[STRING_LENGTH_MAX];           // [ string ]
+  float brakeBias;                                            // [ RANGE = 0->1... ] [ UNSET = -1 ]
+  float turboBoostPressure;                                   // [ RANGE = 0->1... ] [ UNSET = -1 ]
+  char tyreCompound[TYRE_MAX][TYRE_COMPOUND_NAME_LENGTH_MAX]; // [ strings  ]
+  PitSchedule pitSchedules[STORED_PARTICIPANTS_MAX];
+  FlagColour highestFlagColours[STORED_PARTICIPANTS_MAX];
+  FlagReason highestFlagReasons[STORED_PARTICIPANTS_MAX];
+  unsigned nationalities[STORED_PARTICIPANTS_MAX]; // [ nationality table, SP AND UNSET = 0 ]
+  float snowDensity; // [ UNITS = How much snow will fall ] [ RANGE = 0->1 ] non zero only in Winter and Snow seasons
 
   // AMS2 Additions (v10...)
   // Session info
-  float
-      mSessionDuration; // [ UNITS = minutes ] [ UNSET = 0 ] scheduled session length. Unset = laps race (mLapsInEvent)
-  int mSessionAdditionalLaps; // The number of additional complete laps lead lap drivers must complete to finish a timed
-                              // race after the session duration has elapsed.
+  float sessionDuration; // [ UNITS = minutes ] [ UNSET = 0 ] scheduled session length. Unset = laps race (lapsInEvent)
+  int sessionAdditionalLaps; // The number of additional complete laps lead lap drivers must complete to finish a timed
+                             // race after the session duration has elapsed.
 
   // Tyres
-  float mTyreTempLeft[TYRE_MAX];   // [ UNITS = Celsius ] [ UNSET = 0 ]
-  float mTyreTempCenter[TYRE_MAX]; // [ UNITS = Celsius ] [ UNSET = 0 ]
-  float mTyreTempRight[TYRE_MAX];  // [ UNITS = Celsius ] [ UNSET = 0 ]
+  float tyreTempLeft[TYRE_MAX];   // [ UNITS = Celsius ] [ UNSET = 0 ]
+  float tyreTempCenter[TYRE_MAX]; // [ UNITS = Celsius ] [ UNSET = 0 ]
+  float tyreTempRight[TYRE_MAX];  // [ UNITS = Celsius ] [ UNSET = 0 ]
 
   // DRS
-  DrsState mDrsState;
+  DrsState drsState;
 
   // Suspension
-  float mRideHeight[TYRE_MAX]; // [ UNITS = cm ]
+  float rideHeight[TYRE_MAX]; // [ UNITS = cm ]
 
   // Input
-  unsigned mJoyPad0; // button mask
-  unsigned mDPad;    // button mask
+  unsigned joyPad0; // button mask
+  unsigned dPad;    // button mask
 
-  int mAntiLockSetting;        // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
-  int mTractionControlSetting; // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
+  int antiLockSetting;        // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
+  int tractionControlSetting; // [ UNSET = -1 ] Current ABS garage setting. Valid under player control only.
 
   // ERS
-  ErsDeploymentMode mErsDeploymentMode;
-  bool mErsAutoModeEnabled; // true if deployment mode was selected by auto system. Valid only when mErsDeploymentMode >
-                            // ERS_DEPLOYMENT_MODE_NONE
+  ErsDeploymentMode ersDeploymentMode;
+  bool ersAutoModeEnabled; // true if deployment mode was selected by auto system. Valid only when ersDeploymentMode >
+                           // ERS_DEPLOYMENT_MODE_NONE
 
   // Clutch State & Damage
-  float mClutchTemp;      // [ UNITS = Kelvin ] [ UNSET = -273.16 ]
-  float mClutchWear;      // [ RANGE = 0->1... ]
-  bool mClutchOverheated; // true if clutch performance is degraded due to overheating
-  bool mClutchSlipping;   // true if clutch is slipping (can be induced by overheating or wear)
+  float clutchTemp;      // [ UNITS = Kelvin ] [ UNSET = -273.16 ]
+  float clutchWear;      // [ RANGE = 0->1... ]
+  bool clutchOverheated; // true if clutch performance is degraded due to overheating
+  bool clutchSlipping;   // true if clutch is slipping (can be induced by overheating or wear)
 
-  YellowFlagState mYellowFlagState;
-  bool mSessionIsPrivate; // true if this is a private session where users cannot see or interact with other drivers
-                          // (and so would not need positional awareness of them etc)
-  LaunchStage mLaunchStage;
+  YellowFlagState yellowFlagState;
+  bool sessionIsPrivate; // true if this is a private session where users cannot see or interact with other drivers
+                         // (and so would not need positional awareness of them etc)
+  LaunchStage launchStage;
 } ams2_telemetry;
 
 #ifdef __cplusplus

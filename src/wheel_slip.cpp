@@ -40,11 +40,11 @@ int main() {
     ams2_telemetry tele;
     read_ams2_telemetry(pid, &tele, remote_addr);
 
-    auto x_vel = tele.mLocalVelocity[2];
-    auto fl = compute_slip(tele.mTyreRPS[0], x_vel);
-    auto fr = compute_slip(tele.mTyreRPS[1], x_vel);
-    auto rl = compute_slip(tele.mTyreRPS[2], x_vel);
-    auto rr = compute_slip(tele.mTyreRPS[3], x_vel);
+    auto x_vel = tele.localVelocity[2];
+    auto fl = compute_slip(tele.tyreRPS[0], x_vel);
+    auto fr = compute_slip(tele.tyreRPS[1], x_vel);
+    auto rl = compute_slip(tele.tyreRPS[2], x_vel);
+    auto rr = compute_slip(tele.tyreRPS[3], x_vel);
     slip_fl.push_front(fl);
     slip_fr.push_front(fr);
     slip_rl.push_front(rl);
@@ -76,8 +76,8 @@ int main() {
 
     using namespace ftxui;
     return vbox({
-        text(std::format("Speed: {}m/s Tyre: {}RPS = {}m/s", x_vel, tele.mTyreRPS[0],
-                         TYRE_DIAMETER / 2 * tele.mTyreRPS[0])) |
+        text(std::format("Speed: {}m/s Tyre: {}RPS = {}m/s", x_vel, tele.tyreRPS[0],
+                         TYRE_DIAMETER / 2 * tele.tyreRPS[0])) |
             bold,
         separator(),
         hbox({

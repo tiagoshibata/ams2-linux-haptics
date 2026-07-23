@@ -42,9 +42,9 @@ int main() {
       printf("AMS2 Telemetry\n");
       printf("========================================\n");
 
-      print_bar("Throttle", GREEN, tele.mUnfilteredThrottle);
-      print_bar("Brake", RED, tele.mUnfilteredBrake);
-      print_bar("Steering", BLUE, (tele.mUnfilteredSteering + 1.0f) / 2.0f);
+      print_bar("Throttle", GREEN, tele.unfilteredThrottle);
+      print_bar("Brake", RED, tele.unfilteredBrake);
+      print_bar("Steering", BLUE, (tele.unfilteredSteering + 1.0f) / 2.0f);
 
       printf("\n");
       fflush(stdout);

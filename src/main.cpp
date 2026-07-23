@@ -31,11 +31,11 @@ int main() {
     ams2_telemetry tele;
     read_ams2_telemetry(pid, &tele, remote_addr);
 
-    throttle_history.push_front(tele.mUnfilteredThrottle);
+    throttle_history.push_front(tele.unfilteredThrottle);
     throttle_history.pop_back();
-    brake_history.push_front(tele.mUnfilteredBrake);
+    brake_history.push_front(tele.unfilteredBrake);
     brake_history.pop_back();
-    steering_history.push_front((tele.mUnfilteredSteering + 1.0f) / 2.0f);
+    steering_history.push_front((tele.unfilteredSteering + 1.0f) / 2.0f);
     steering_history.pop_back();
 
     auto c = ftxui::Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -60,18 +60,18 @@ int main() {
         separator(),
         hbox({
             text("Throttle: "),
-            gauge(tele.mUnfilteredThrottle) | color(Color::Green),
-            text(" " + std::to_string((int)(tele.mUnfilteredThrottle * 100)) + "%"),
+            gauge(tele.unfilteredThrottle) | color(Color::Green),
+            text(" " + std::to_string((int)(tele.unfilteredThrottle * 100)) + "%"),
         }),
         hbox({
             text("Brake:    "),
-            gauge(tele.mUnfilteredBrake) | color(Color::Red),
-            text(" " + std::to_string((int)(tele.mUnfilteredBrake * 100)) + "%"),
+            gauge(tele.unfilteredBrake) | color(Color::Red),
+            text(" " + std::to_string((int)(tele.unfilteredBrake * 100)) + "%"),
         }),
         hbox({
             text("Steering: "),
-            gauge((tele.mUnfilteredSteering + 1.0f) / 2.0f) | color(Color::Blue),
-            text(" " + std::to_string((int)((tele.mUnfilteredSteering + 1.0f) / 2.0f * 100)) + "%"),
+            gauge((tele.unfilteredSteering + 1.0f) / 2.0f) | color(Color::Blue),
+            text(" " + std::to_string((int)((tele.unfilteredSteering + 1.0f) / 2.0f * 100)) + "%"),
         }),
         canvas(std::move(c)) | border,
     });

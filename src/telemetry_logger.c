@@ -4,7 +4,7 @@
 
 #include "ams2_telemetry.h"
 
-static const char *names_mGameState[] = {
+static const char *names_gameState[] = {
     "GAME_EXITED",
     "GAME_FRONT_END",
     "GAME_INGAME_PLAYING",
@@ -15,17 +15,17 @@ static const char *names_mGameState[] = {
     "GAME_FRONT_END_REPLAY",
 };
 
-static const char *names_mSessionState[] = {
+static const char *names_sessionState[] = {
     "SESSION_INVALID",       "SESSION_PRACTICE", "SESSION_TEST",        "SESSION_QUALIFY",
     "SESSION_FORMATION_LAP", "SESSION_RACE",     "SESSION_TIME_ATTACK",
 };
 
-static const char *names_mRaceStates[] = {
+static const char *names_raceStates[] = {
     "RACESTATE_INVALID",      "RACESTATE_NOT_STARTED", "RACESTATE_RACING", "RACESTATE_FINISHED",
     "RACESTATE_DISQUALIFIED", "RACESTATE_RETIRED",     "RACESTATE_DNF",
 };
 
-static const char *names_mHighestFlagColours[] = {
+static const char *names_highestFlagColours[] = {
     "FLAG_COLOUR_NONE",
     "FLAG_COLOUR_GREEN",
     "FLAG_COLOUR_BLUE",
@@ -40,12 +40,12 @@ static const char *names_mHighestFlagColours[] = {
     "FLAG_COLOUR_CHEQUERED",
 };
 
-static const char *names_mPitModes[] = {
+static const char *names_pitModes[] = {
     "PIT_MODE_NONE",      "PIT_MODE_DRIVING_INTO_PITS",     "PIT_MODE_IN_PIT", "PIT_MODE_DRIVING_OUT_OF_PITS",
     "PIT_MODE_IN_GARAGE", "PIT_MODE_DRIVING_OUT_OF_GARAGE",
 };
 
-static const char *names_mPitSchedules[] = {
+static const char *names_pitSchedules[] = {
     "PIT_SCHEDULE_NONE",
     "PIT_SCHEDULE_PLAYER_REQUESTED",
     "PIT_SCHEDULE_ENGINEER_REQUESTED",
@@ -56,24 +56,24 @@ static const char *names_mPitSchedules[] = {
     "PIT_SCHEDULE_PITSPOT_OCCUPIED",
 };
 
-static const char *names_mCrashState[] = {
+static const char *names_crashState[] = {
     "CRASH_DAMAGE_NONE",     "CRASH_DAMAGE_OFFTRACK", "CRASH_DAMAGE_LARGE_PROP",
     "CRASH_DAMAGE_SPINNING", "CRASH_DAMAGE_ROLLING",
 };
 
-static const char *names_mErsDeploymentMode[] = {
+static const char *names_ersDeploymentMode[] = {
     "ERS_DEPLOYMENT_MODE_NONE",     "ERS_DEPLOYMENT_MODE_OFF",    "ERS_DEPLOYMENT_MODE_BUILD",
     "ERS_DEPLOYMENT_MODE_BALANCED", "ERS_DEPLOYMENT_MODE_ATTACK", "ERS_DEPLOYMENT_MODE_QUAL",
 };
 
-static const char *names_mYellowFlagState[] = {
+static const char *names_yellowFlagState[] = {
     "YFS_INVALID",   "YFS_NONE",       "YFS_PENDING",  "YFS_PITS_CLOSED", "YFS_PIT_LEAD_LAP",
     "YFS_PITS_OPEN", "YFS_PITS_OPEN2", "YFS_LAST_LAP", "YFS_RESUME",      "YFS_RACE_HALT",
 };
 
-static const char *names_mLaunchStage[] = {"LAUNCH_INVALID", "LAUNCH_OFF", "LAUNCH_REV", "LAUNCH_ON"};
+static const char *names_launchStage[] = {"LAUNCH_INVALID", "LAUNCH_OFF", "LAUNCH_REV", "LAUNCH_ON"};
 
-static const char *names_mTyreTerrain[] = {
+static const char *names_tyreTerrain[] = {
     "TERRAIN_ROAD",
     "TERRAIN_LOW_GRIP_ROAD",
     "TERRAIN_BUMPY_ROAD1",
@@ -127,25 +127,25 @@ static const char *names_mTyreTerrain[] = {
     "TERRAIN_RALLY_TARMAC",
 };
 
-static const char *names_mHighestFlagReasons[] = {
+static const char *names_highestFlagReasons[] = {
     "FLAG_REASON_NONE",
     "FLAG_REASON_SOLO_CRASH",
     "FLAG_REASON_VEHICLE_CRASH",
     "FLAG_REASON_VEHICLE_OBSTRUCTION",
 };
 
-static const char *names_mCarFlags[] = {
+static const char *names_carFlags[] = {
     "CAR_HEADLIGHT", "CAR_ENGINE_ACTIVE", "CAR_ENGINE_WARNING", "CAR_SPEED_LIMITER", "CAR_ABS", "CAR_HANDBRAKE",
     "CAR_TCS",       "CAR_SCS",
 };
 
-static const char *names_mTyreFlags[] = {
+static const char *names_tyreFlags[] = {
     "TYRE_ATTACHED",
     "TYRE_INFLATED",
     "TYRE_IS_ON_GROUND",
 };
 
-static const char *names_mDrsState[] = {
+static const char *names_drsState[] = {
     "DRS_INSTALLED", "DRS_ZONE_RULES", "DRS_AVAILABLE_NEXT", "DRS_AVAILABLE_NOW", "DRS_ACTIVE",
 };
 
@@ -232,163 +232,162 @@ static void print_array_enum(const char *name, const int *indices, const char **
 #define PRINT_ARRAY_ENUM(key, size) print_array_enum(#key, tele->key, names_##key, size)
 
 static void print_as_json(const ams2_telemetry *tele) {
-  printf("{\"mVersion\":%u,\"mBuildVersionNumber\":%u,\"mGameState\":\"%s\",\"mSessionState\":\"%s\",\"mRaceState\":\"%"
-         "s\",\"mViewedParticipantIndex\":%d,",
-         tele->mVersion, tele->mBuildVersionNumber, names_mGameState[tele->mGameState],
-         names_mSessionState[tele->mSessionState], names_mRaceStates[tele->mRaceState], tele->mViewedParticipantIndex);
+  printf("{\"Version\":%u,\"BuildVersionNumber\":%u,\"GameState\":\"%s\",\"SessionState\":\"%s\",\"RaceState\":\"%"
+         "s\",\"ViewedParticipantIndex\":%d,",
+         tele->version, tele->buildVersionNumber, names_gameState[tele->gameState],
+         names_sessionState[tele->sessionState], names_raceStates[tele->raceState], tele->viewedParticipantIndex);
 
-  if (tele->mNumParticipants) {
-    printf("\"mParticipantInfo\":");
+  if (tele->numParticipants) {
+    printf("\"ParticipantInfo\":");
     char sep = '[';
-    for (int i = 0; i < tele->mNumParticipants; i++) {
-      printf("%c{\"mIsActive\":%s,\"mName\":\"%.64s\",\"mWorldPosition\":[%f,%f,%f],\"mCurrentLapDistance\":%f,"
-             "\"mRacePosition\":%u,\"mLapsCompleted\":%u,\"mCurrentLap\":%u,\"mCurrentSector\":%d}",
-             sep, tele->mParticipantInfo[i].mIsActive ? "true" : "false", tele->mParticipantInfo[i].mName,
-             tele->mParticipantInfo[i].mWorldPosition[0], tele->mParticipantInfo[i].mWorldPosition[1],
-             tele->mParticipantInfo[i].mWorldPosition[2], tele->mParticipantInfo[i].mCurrentLapDistance,
-             tele->mParticipantInfo[i].mRacePosition, tele->mParticipantInfo[i].mLapsCompleted,
-             tele->mParticipantInfo[i].mCurrentLap, tele->mParticipantInfo[i].mCurrentSector);
+    for (int i = 0; i < tele->numParticipants; i++) {
+      printf("%c{\"IsActive\":%s,\"Name\":\"%.64s\",\"WorldPosition\":[%f,%f,%f],\"CurrentLapDistance\":%f,"
+             "\"RacePosition\":%u,\"LapsCompleted\":%u,\"CurrentLap\":%u,\"CurrentSector\":%d}",
+             sep, tele->participantInfo[i].isActive ? "true" : "false", tele->participantInfo[i].name,
+             tele->participantInfo[i].worldPosition[0], tele->participantInfo[i].worldPosition[1],
+             tele->participantInfo[i].worldPosition[2], tele->participantInfo[i].currentLapDistance,
+             tele->participantInfo[i].racePosition, tele->participantInfo[i].lapsCompleted,
+             tele->participantInfo[i].currentLap, tele->participantInfo[i].currentSector);
       sep = ',';
     }
     printf("],");
   }
 
-  PRINT_BITFLAG(mCarFlags);
-  printf("\"mTyreFlags\":[");
+  PRINT_BITFLAG(carFlags);
+  printf("\"TyreFlags\":[");
   for (int i = 0; i < TYRE_MAX; ++i) {
-    print_bitflag_value(tele->mTyreFlags[i], names_mTyreFlags);
+    print_bitflag_value(tele->tyreFlags[i], names_tyreFlags);
   }
   printf("],");
 
-  PRINT_ARRAY_ENUM(mTyreTerrain, 4);
-  printf(
-      "\"mUnfilteredThrottle\":%f,\"mUnfilteredBrake\":%f,\"mUnfilteredSteering\":%f,\"mUnfilteredClutch\":%f,"
-      "\"mCarName\":\"%.64s\",\"mCarClassName\":\"%.64s\",\"mLapsInEvent\":%u,\"mTrackLocation\":\"%.64s\","
-      "\"mTrackVariation\":\"%.64s\",\"mTrackLength\":%f,\"mNumSectors\":%d,\"mLapInvalidated\":%s,\"mBestLapTime\":%f,"
-      "\"mLastLapTime\":%f,\"mCurrentTime\":%f,\"mSplitTimeAhead\":%f,\"mSplitTimeBehind\":%f,\"mSplitTime\":%f,"
-      "\"mEventTimeRemaining\":%f,\"mPersonalFastestLapTime\":%f,\"mWorldFastestLapTime\":%f,\"mCurrentSector1Time\":%"
-      "f,\"mCurrentSector2Time\":%f,\"mCurrentSector3Time\":%f,\"mFastestSector1Time\":%f,\"mFastestSector2Time\":%f,"
-      "\"mFastestSector3Time\":%f,\"mPersonalFastestSector1Time\":%f,\"mPersonalFastestSector2Time\":%f,"
-      "\"mPersonalFastestSector3Time\":%f,\"mWorldFastestSector1Time\":%f,\"mWorldFastestSector2Time\":%f,"
-      "\"mWorldFastestSector3Time\":%f,\"mHighestFlagColour\":\"%s\",\"mHighestFlagReason\":\"%s\",\"mPitMode\":\"%s\","
-      "\"mPitSchedule\":\"%s\",\"mOilTempCelsius\":%f,\"mOilPressureKPa\":%f,\"mWaterTempCelsius\":%f,"
-      "\"mWaterPressureKPa\":%f,\"mFuelPressureKPa\":%f,\"mFuelLevel\":%f,\"mFuelCapacity\":%f,\"mSpeed\":%f,\"mRpm\":%"
-      "f,\"mMaxRPM\":%f,\"mBrake\":%f,\"mThrottle\":%f,\"mClutch\":%f,\"mSteering\":%f,\"mGear\":%d,\"mNumGears\":%d,"
-      "\"mOdometerKM\":%f,\"mAntiLockActive\":%s,\"mLastOpponentCollisionIndex\":%d,"
-      "\"mLastOpponentCollisionMagnitude\":%f,\"mBoostActive\":%s,\"mBoostAmount\":%f,",
-      tele->mUnfilteredThrottle, tele->mUnfilteredBrake, tele->mUnfilteredSteering, tele->mUnfilteredClutch,
-      tele->mCarName, tele->mCarClassName, tele->mLapsInEvent, tele->mTrackLocation, tele->mTrackVariation,
-      tele->mTrackLength, tele->mNumSectors, tele->mLapInvalidated ? "true" : "false", tele->mBestLapTime,
-      tele->mLastLapTime, tele->mCurrentTime, tele->mSplitTimeAhead, tele->mSplitTimeBehind, tele->mSplitTime,
-      tele->mEventTimeRemaining, tele->mPersonalFastestLapTime, tele->mWorldFastestLapTime, tele->mCurrentSector1Time,
-      tele->mCurrentSector2Time, tele->mCurrentSector3Time, tele->mFastestSector1Time, tele->mFastestSector2Time,
-      tele->mFastestSector3Time, tele->mPersonalFastestSector1Time, tele->mPersonalFastestSector2Time,
-      tele->mPersonalFastestSector3Time, tele->mWorldFastestSector1Time, tele->mWorldFastestSector2Time,
-      tele->mWorldFastestSector3Time, names_mHighestFlagColours[tele->mHighestFlagColour],
-      names_mHighestFlagReasons[tele->mHighestFlagReason], names_mPitModes[tele->mPitMode],
-      names_mPitSchedules[tele->mPitSchedule], tele->mOilTempCelsius, tele->mOilPressureKPa, tele->mWaterTempCelsius,
-      tele->mWaterPressureKPa, tele->mFuelPressureKPa, tele->mFuelLevel, tele->mFuelCapacity, tele->mSpeed, tele->mRpm,
-      tele->mMaxRPM, tele->mBrake, tele->mThrottle, tele->mClutch, tele->mSteering, tele->mGear, tele->mNumGears,
-      tele->mOdometerKM, tele->mAntiLockActive ? "true" : "false", tele->mLastOpponentCollisionIndex,
-      tele->mLastOpponentCollisionMagnitude, tele->mBoostActive ? "true" : "false", tele->mBoostAmount);
+  PRINT_ARRAY_ENUM(tyreTerrain, 4);
+  printf("\"UnfilteredThrottle\":%f,\"UnfilteredBrake\":%f,\"UnfilteredSteering\":%f,\"UnfilteredClutch\":%f,"
+         "\"CarName\":\"%.64s\",\"CarClassName\":\"%.64s\",\"LapsInEvent\":%u,\"TrackLocation\":\"%.64s\","
+         "\"TrackVariation\":\"%.64s\",\"TrackLength\":%f,\"NumSectors\":%d,\"LapInvalidated\":%s,\"BestLapTime\":%f,"
+         "\"LastLapTime\":%f,\"CurrentTime\":%f,\"SplitTimeAhead\":%f,\"SplitTimeBehind\":%f,\"SplitTime\":%f,"
+         "\"EventTimeRemaining\":%f,\"PersonalFastestLapTime\":%f,\"WorldFastestLapTime\":%f,\"CurrentSector1Time\":%"
+         "f,\"CurrentSector2Time\":%f,\"CurrentSector3Time\":%f,\"FastestSector1Time\":%f,\"FastestSector2Time\":%f,"
+         "\"FastestSector3Time\":%f,\"PersonalFastestSector1Time\":%f,\"PersonalFastestSector2Time\":%f,"
+         "\"PersonalFastestSector3Time\":%f,\"WorldFastestSector1Time\":%f,\"WorldFastestSector2Time\":%f,"
+         "\"WorldFastestSector3Time\":%f,\"HighestFlagColour\":\"%s\",\"HighestFlagReason\":\"%s\",\"PitMode\":\"%s\","
+         "\"PitSchedule\":\"%s\",\"OilTempCelsius\":%f,\"OilPressureKPa\":%f,\"WaterTempCelsius\":%f,"
+         "\"WaterPressureKPa\":%f,\"FuelPressureKPa\":%f,\"FuelLevel\":%f,\"FuelCapacity\":%f,\"Speed\":%f,\"Rpm\":%"
+         "f,\"MaxRPM\":%f,\"Brake\":%f,\"Throttle\":%f,\"Clutch\":%f,\"Steering\":%f,\"Gear\":%d,\"NumGears\":%d,"
+         "\"OdometerKM\":%f,\"AntiLockActive\":%s,\"LastOpponentCollisionIndex\":%d,"
+         "\"LastOpponentCollisionMagnitude\":%f,\"BoostActive\":%s,\"BoostAmount\":%f,",
+         tele->unfilteredThrottle, tele->unfilteredBrake, tele->unfilteredSteering, tele->unfilteredClutch,
+         tele->carName, tele->carClassName, tele->lapsInEvent, tele->trackLocation, tele->trackVariation,
+         tele->trackLength, tele->numSectors, tele->lapInvalidated ? "true" : "false", tele->bestLapTime,
+         tele->lastLapTime, tele->currentTime, tele->splitTimeAhead, tele->splitTimeBehind, tele->splitTime,
+         tele->eventTimeRemaining, tele->personalFastestLapTime, tele->worldFastestLapTime, tele->currentSector1Time,
+         tele->currentSector2Time, tele->currentSector3Time, tele->fastestSector1Time, tele->fastestSector2Time,
+         tele->fastestSector3Time, tele->personalFastestSector1Time, tele->personalFastestSector2Time,
+         tele->personalFastestSector3Time, tele->worldFastestSector1Time, tele->worldFastestSector2Time,
+         tele->worldFastestSector3Time, names_highestFlagColours[tele->highestFlagColour],
+         names_highestFlagReasons[tele->highestFlagReason], names_pitModes[tele->pitMode],
+         names_pitSchedules[tele->pitSchedule], tele->oilTempCelsius, tele->oilPressureKPa, tele->waterTempCelsius,
+         tele->waterPressureKPa, tele->fuelPressureKPa, tele->fuelLevel, tele->fuelCapacity, tele->speed, tele->rpm,
+         tele->maxRPM, tele->brake, tele->throttle, tele->clutch, tele->steering, tele->gear, tele->numGears,
+         tele->odometerKM, tele->antiLockActive ? "true" : "false", tele->lastOpponentCollisionIndex,
+         tele->lastOpponentCollisionMagnitude, tele->boostActive ? "true" : "false", tele->boostAmount);
 
-  PRINT_3F(mOrientation);
-  PRINT_3F(mLocalVelocity);
-  PRINT_3F(mWorldVelocity);
-  PRINT_3F(mAngularVelocity);
-  PRINT_3F(mLocalAcceleration);
-  PRINT_3F(mWorldAcceleration);
-  PRINT_3F(mExtentsCentre);
-  PRINT_4F(mTyreY);
-  PRINT_4F(mTyreRPS);
-  PRINT_4F(mTyreTemp);
-  PRINT_4F(mTyreHeightAboveGround);
-  PRINT_4F(mTyreWear);
-  PRINT_4F(mBrakeDamage);
-  PRINT_4F(mSuspensionDamage);
-  PRINT_4F(mBrakeTempCelsius);
-  PRINT_4F(mTyreTreadTemp);
-  PRINT_4F(mTyreLayerTemp);
-  PRINT_4F(mTyreCarcassTemp);
-  PRINT_4F(mTyreRimTemp);
-  PRINT_4F(mTyreInternalAirTemp);
+  PRINT_3F(orientation);
+  PRINT_3F(localVelocity);
+  PRINT_3F(worldVelocity);
+  PRINT_3F(angularVelocity);
+  PRINT_3F(localAcceleration);
+  PRINT_3F(worldAcceleration);
+  PRINT_3F(extentsCentre);
+  PRINT_4F(tyreY);
+  PRINT_4F(tyreRPS);
+  PRINT_4F(tyreTemp);
+  PRINT_4F(tyreHeightAboveGround);
+  PRINT_4F(tyreWear);
+  PRINT_4F(brakeDamage);
+  PRINT_4F(suspensionDamage);
+  PRINT_4F(brakeTempCelsius);
+  PRINT_4F(tyreTreadTemp);
+  PRINT_4F(tyreLayerTemp);
+  PRINT_4F(tyreCarcassTemp);
+  PRINT_4F(tyreRimTemp);
+  PRINT_4F(tyreInternalAirTemp);
 
-  printf("\"mCrashState\":\"%s\",\"mAeroDamage\":%f,\"mEngineDamage\":%f,\"mAmbientTemperature\":%f,"
-         "\"mTrackTemperature\":%f,\"mRainDensity\":%f,\"mWindSpeed\":%f,\"mWindDirectionX\":%f,\"mWindDirectionY\":%f,"
-         "\"mCloudBrightness\":%f,\"mSequenceNumber\":%u,",
-         names_mCrashState[tele->mCrashState], tele->mAeroDamage, tele->mEngineDamage, tele->mAmbientTemperature,
-         tele->mTrackTemperature, tele->mRainDensity, tele->mWindSpeed, tele->mWindDirectionX, tele->mWindDirectionY,
-         tele->mCloudBrightness, tele->mSequenceNumber);
+  printf("\"CrashState\":\"%s\",\"AeroDamage\":%f,\"EngineDamage\":%f,\"AmbientTemperature\":%f,"
+         "\"TrackTemperature\":%f,\"RainDensity\":%f,\"WindSpeed\":%f,\"WindDirectionX\":%f,\"WindDirectionY\":%f,"
+         "\"CloudBrightness\":%f,\"SequenceNumber\":%u,",
+         names_crashState[tele->crashState], tele->aeroDamage, tele->engineDamage, tele->ambientTemperature,
+         tele->trackTemperature, tele->rainDensity, tele->windSpeed, tele->windDirectionX, tele->windDirectionY,
+         tele->cloudBrightness, tele->sequenceNumber);
 
-  PRINT_4F(mWheelLocalPositionY);
-  PRINT_4F(mSuspensionTravel);
-  PRINT_4F(mSuspensionVelocity);
-  PRINT_4F(mAirPressure);
-  printf("\"mEngineSpeed\":%f,\"mEngineTorque\":%f,\"mWings\":[%f,%f],\"mHandBrake\":%f,\"mEnforcedPitStopLap\":%d,"
-         "\"mTranslatedTrackLocation\":\"%.64s\",\"mTranslatedTrackVariation\":\"%.64s\",\"mBrakeBias\":%f,"
-         "\"mTurboBoostPressure\":%f,\"mTyreCompound\":[\"%.40s\",\"%.40s\",\"%.40s\",\"%.40s\"],\"mSnowDensity\":%f,"
-         "\"mSessionDuration\":%f,\"mSessionAdditionalLaps\":%d,",
-         tele->mEngineSpeed, tele->mEngineTorque, tele->mWings[0], tele->mWings[1], tele->mHandBrake,
-         tele->mEnforcedPitStopLap, tele->mTranslatedTrackLocation, tele->mTranslatedTrackVariation, tele->mBrakeBias,
-         tele->mTurboBoostPressure, tele->mTyreCompound[0], tele->mTyreCompound[1], tele->mTyreCompound[2],
-         tele->mTyreCompound[3], tele->mSnowDensity, tele->mSessionDuration, tele->mSessionAdditionalLaps);
+  PRINT_4F(wheelLocalPositionY);
+  PRINT_4F(suspensionTravel);
+  PRINT_4F(suspensionVelocity);
+  PRINT_4F(airPressure);
+  printf("\"EngineSpeed\":%f,\"EngineTorque\":%f,\"Wings\":[%f,%f],\"HandBrake\":%f,\"EnforcedPitStopLap\":%d,"
+         "\"TranslatedTrackLocation\":\"%.64s\",\"TranslatedTrackVariation\":\"%.64s\",\"BrakeBias\":%f,"
+         "\"TurboBoostPressure\":%f,\"TyreCompound\":[\"%.40s\",\"%.40s\",\"%.40s\",\"%.40s\"],\"SnowDensity\":%f,"
+         "\"SessionDuration\":%f,\"SessionAdditionalLaps\":%d,",
+         tele->engineSpeed, tele->engineTorque, tele->wings[0], tele->wings[1], tele->handBrake,
+         tele->enforcedPitStopLap, tele->translatedTrackLocation, tele->translatedTrackVariation, tele->brakeBias,
+         tele->turboBoostPressure, tele->tyreCompound[0], tele->tyreCompound[1], tele->tyreCompound[2],
+         tele->tyreCompound[3], tele->snowDensity, tele->sessionDuration, tele->sessionAdditionalLaps);
 
-  PRINT_4F(mTyreTempLeft);
-  PRINT_4F(mTyreTempCenter);
-  PRINT_4F(mTyreTempRight);
-  PRINT_4F(mRideHeight);
+  PRINT_4F(tyreTempLeft);
+  PRINT_4F(tyreTempCenter);
+  PRINT_4F(tyreTempRight);
+  PRINT_4F(rideHeight);
 
-  PRINT_BITFLAG(mDrsState);
+  PRINT_BITFLAG(drsState);
 
-  printf("\"mJoyPad0\":%u,\"mDPad\":%u,\"mAntiLockSetting\":%d,\"mTractionControlSetting\":%d,\"mErsDeploymentMode\":"
-         "\"%s\",\"mErsAutoModeEnabled\":%s,\"mClutchTemp\":%f,\"mClutchWear\":%f,\"mClutchOverheated\":%s,"
-         "\"mClutchSlipping\":%s,\"mYellowFlagState\":\"%s\",\"mSessionIsPrivate\":%s,\"mLaunchStage\":\"%s\",",
-         tele->mJoyPad0, tele->mDPad, tele->mAntiLockSetting, tele->mTractionControlSetting,
-         names_mErsDeploymentMode[tele->mErsDeploymentMode], tele->mErsAutoModeEnabled ? "true" : "false",
-         tele->mClutchTemp, tele->mClutchWear, tele->mClutchOverheated ? "true" : "false",
-         tele->mClutchSlipping ? "true" : "false", names_mYellowFlagState[tele->mYellowFlagState],
-         tele->mSessionIsPrivate ? "true" : "false", names_mLaunchStage[tele->mLaunchStage + 1]);
+  printf("\"JoyPad0\":%u,\"DPad\":%u,\"AntiLockSetting\":%d,\"TractionControlSetting\":%d,\"ErsDeploymentMode\":"
+         "\"%s\",\"ErsAutoModeEnabled\":%s,\"ClutchTemp\":%f,\"ClutchWear\":%f,\"ClutchOverheated\":%s,"
+         "\"ClutchSlipping\":%s,\"YellowFlagState\":\"%s\",\"SessionIsPrivate\":%s,\"LaunchStage\":\"%s\",",
+         tele->joyPad0, tele->dPad, tele->antiLockSetting, tele->tractionControlSetting,
+         names_ersDeploymentMode[tele->ersDeploymentMode], tele->ersAutoModeEnabled ? "true" : "false",
+         tele->clutchTemp, tele->clutchWear, tele->clutchOverheated ? "true" : "false",
+         tele->clutchSlipping ? "true" : "false", names_yellowFlagState[tele->yellowFlagState],
+         tele->sessionIsPrivate ? "true" : "false", names_launchStage[tele->launchStage + 1]);
 
-  if (tele->mNumParticipants) {
-    PRINT_ARRAY_F(mCurrentSector1Times, tele->mNumParticipants);
-    PRINT_ARRAY_F(mCurrentSector2Times, tele->mNumParticipants);
-    PRINT_ARRAY_F(mCurrentSector3Times, tele->mNumParticipants);
-    PRINT_ARRAY_F(mFastestSector1Times, tele->mNumParticipants);
-    PRINT_ARRAY_F(mFastestSector2Times, tele->mNumParticipants);
-    PRINT_ARRAY_F(mFastestSector3Times, tele->mNumParticipants);
-    PRINT_ARRAY_F(mFastestLapTimes, tele->mNumParticipants);
-    PRINT_ARRAY_F(mLastLapTimes, tele->mNumParticipants);
+  if (tele->numParticipants) {
+    PRINT_ARRAY_F(currentSector1Times, tele->numParticipants);
+    PRINT_ARRAY_F(currentSector2Times, tele->numParticipants);
+    PRINT_ARRAY_F(currentSector3Times, tele->numParticipants);
+    PRINT_ARRAY_F(fastestSector1Times, tele->numParticipants);
+    PRINT_ARRAY_F(fastestSector2Times, tele->numParticipants);
+    PRINT_ARRAY_F(fastestSector3Times, tele->numParticipants);
+    PRINT_ARRAY_F(fastestLapTimes, tele->numParticipants);
+    PRINT_ARRAY_F(lastLapTimes, tele->numParticipants);
 
     char sep = '[';
-    printf("\"mLapsInvalidated\":");
-    for (int i = 0; i < tele->mNumParticipants; i++) {
-      printf("%c%s", sep, tele->mLapsInvalidated[i] ? "true" : "false");
+    printf("\"LapsInvalidated\":");
+    for (int i = 0; i < tele->numParticipants; i++) {
+      printf("%c%s", sep, tele->lapsInvalidated[i] ? "true" : "false");
       sep = ',';
     }
     printf("],");
 
-    PRINT_ARRAY_ENUM(mRaceStates, tele->mNumParticipants);
-    PRINT_ARRAY_ENUM(mPitModes, tele->mNumParticipants);
+    PRINT_ARRAY_ENUM(raceStates, tele->numParticipants);
+    PRINT_ARRAY_ENUM(pitModes, tele->numParticipants);
 
     sep = '[';
-    printf("\"mOrientations\":[");
-    for (int i = 0; i < tele->mNumParticipants; i++) {
-      printf("%c[%f,%f,%f]", sep, tele->mOrientations[i][0], tele->mOrientations[i][1], tele->mOrientations[i][2]);
+    printf("\"Orientations\":[");
+    for (int i = 0; i < tele->numParticipants; i++) {
+      printf("%c[%f,%f,%f]", sep, tele->orientations[i][0], tele->orientations[i][1], tele->orientations[i][2]);
       sep = ',';
     }
     printf("],");
 
-    PRINT_ARRAY_F(mSpeeds, tele->mNumParticipants);
-    PRINT_ARRAY_S(mCarNames, tele->mNumParticipants);
-    PRINT_ARRAY_S(mCarClassNames, tele->mNumParticipants);
-    PRINT_ARRAY_ENUM(mPitSchedules, tele->mNumParticipants);
-    PRINT_ARRAY_ENUM(mHighestFlagColours, tele->mNumParticipants);
-    PRINT_ARRAY_ENUM(mHighestFlagReasons, tele->mNumParticipants);
+    PRINT_ARRAY_F(speeds, tele->numParticipants);
+    PRINT_ARRAY_S(carNames, tele->numParticipants);
+    PRINT_ARRAY_S(carClassNames, tele->numParticipants);
+    PRINT_ARRAY_ENUM(pitSchedules, tele->numParticipants);
+    PRINT_ARRAY_ENUM(highestFlagColours, tele->numParticipants);
+    PRINT_ARRAY_ENUM(highestFlagReasons, tele->numParticipants);
 
     sep = '[';
-    printf("\"mNationalities\":[");
-    for (int i = 0; i < tele->mNumParticipants; i++) {
-      printf("%c%u", sep, tele->mNationalities[i]);
+    printf("\"Nationalities\":[");
+    for (int i = 0; i < tele->numParticipants; i++) {
+      printf("%c%u", sep, tele->nationalities[i]);
       sep = ',';
     }
     printf("]");
@@ -421,11 +420,10 @@ int main() {
     }
 
     // Got new update
-    if (seq_num && tele.mSequenceNumber != seq_num + 2) {
-      fprintf(stderr, "mSequenceNumber jumped from %u to %u - some updates were missed\n", seq_num,
-              tele.mSequenceNumber);
+    if (seq_num && tele.sequenceNumber != seq_num + 2) {
+      fprintf(stderr, "SequenceNumber jumped from %u to %u - some updates were missed\n", seq_num, tele.sequenceNumber);
     }
-    seq_num = tele.mSequenceNumber;
+    seq_num = tele.sequenceNumber;
     print_as_json(&tele);
 
     nanosleep(&long_sleep, NULL);

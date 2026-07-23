@@ -123,12 +123,12 @@ bool read_ams2_telemetry(int pid, ams2_telemetry *local_addr, const void *remote
       .iov_len = sizeof(ams2_telemetry),
   };
 
-  unsigned prevSeqNum = local_addr->mSequenceNumber;
+  unsigned prevSeqNum = local_addr->sequenceNumber;
   ssize_t nread = process_vm_readv(pid, &local_iov, 1, &remote_iov, 1, 0);
   if (nread < 0) {
     perror("process_vm_readv"); // AMS2 exit, or not enough permissions
     return false;
   }
 
-  return local_addr->mSequenceNumber != prevSeqNum && (local_addr->mSequenceNumber & 1) == 0;
+  return local_addr->sequenceNumber != prevSeqNum && (local_addr->sequenceNumber & 1) == 0;
 }

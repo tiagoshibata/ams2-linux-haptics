@@ -10,6 +10,13 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-Wall -Wextra -Werror)
 
+add_compile_definitions(
+    IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+    IMGUI_DISABLE_TIME_FUNCTIONS
+    $<$<CONFIG:Release>:IMGUI_DISABLE_DEMO_WINDOWS>
+    $<$<CONFIG:Release>:IMGUI_DISABLE_DEBUG_TOOLS>
+)
+
 # carquet parquet library (submodule)
 set(CARQUET_BUILD_CLI OFF CACHE BOOL "" FORCE)
 add_subdirectory(carquet EXCLUDE_FROM_ALL)
