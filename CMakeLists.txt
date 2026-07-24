@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 4.2.1)
 project(ams2_haptics LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 23)
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -16,6 +16,7 @@ add_compile_definitions(
     $<$<CONFIG:Release>:IMGUI_DISABLE_DEMO_WINDOWS>
     $<$<CONFIG:Release>:IMGUI_DISABLE_DEBUG_TOOLS>
 )
+add_compile_options("$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU>>:-freflection>" -Wno-missing-field-initializers)
 
 # carquet parquet library (submodule)
 set(CARQUET_BUILD_CLI OFF CACHE BOOL "" FORCE)
@@ -29,7 +30,9 @@ add_executable(ams2_telemetry_logger src/telemetry_logger.c src/ams2_telemetry.c
 add_executable(ams2_parquet_logger src/telemetry_parquet.c src/ams2_telemetry.c)
 target_link_libraries(ams2_parquet_logger PRIVATE carquet)
 
-# Sample apps
+add_executable(ams2_parquet_logger_cpp src/telemetry_parquet.cpp src/ams2_telemetry.c)
+target_link_libraries(ams2_parquet_logger_cpp PRIVATE carquet)
+
 include(FetchContent)
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 
