@@ -16,11 +16,21 @@ add_compile_definitions(
     $<$<CONFIG:Release>:IMGUI_DISABLE_DEMO_WINDOWS>
     $<$<CONFIG:Release>:IMGUI_DISABLE_DEBUG_TOOLS>
 )
-add_compile_options("$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU>>:-freflection>" -Wno-missing-field-initializers)
+add_compile_options("$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU>>:-freflection>")
 
-# carquet parquet library (submodule)
+# carquet parquet library
+include(FetchContent)
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+
+FetchContent_Declare(carquet
+  GIT_REPOSITORY https://github.com/Vitruves/carquet.git
+  GIT_TAG v0.7.0
+  GIT_SHALLOW TRUE
+  SYSTEM
+  EXCLUDE_FROM_ALL
+)
 set(CARQUET_BUILD_CLI OFF CACHE BOOL "" FORCE)
-add_subdirectory(carquet EXCLUDE_FROM_ALL)
+FetchContent_MakeAvailable(carquet)
 target_compile_options(carquet PRIVATE -Wno-error)
 
 # stdout telemetry logger
@@ -32,9 +42,6 @@ target_link_libraries(ams2_parquet_logger PRIVATE carquet)
 
 add_executable(ams2_parquet_logger_cpp src/telemetry_parquet.cpp src/ams2_telemetry.c)
 target_link_libraries(ams2_parquet_logger_cpp PRIVATE carquet)
-
-include(FetchContent)
-set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 
 FetchContent_Declare(ftxui
   GIT_REPOSITORY https://github.com/arthursonzogni/ftxui.git
