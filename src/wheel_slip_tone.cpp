@@ -1,6 +1,5 @@
 #include <cmath>
 #include <getopt.h>
-#include <signal.h>
 #include <stdint.h>
 #include <unistd.h>
 
@@ -34,28 +33,21 @@
 constexpr float TYRE_DIAMETER = 0.584f;
 
 static struct {
-  const char *sink_name;
-  int frequency;
-} cli_args = {};
+  const char *sink_name = nullptr;
+  int frequency = DEFAULT_FREQUENCY;
+} cli_args;
 
 static std::atomic<float> g_max_slip{0.0f};
 static std::atomic<bool> g_running{true};
 static struct pw_main_loop *main_loop = nullptr;
 static struct pw_stream *stream = nullptr;
 
-static void signal_handler([[maybe_unused]] int sig) {
-  g_running.store(false, std::memory_order_relaxed);
-  if (main_loop) {
-    pw_main_loop_quit(main_loop);
-  }
-}
-
 static float compute_slip(float tyre_rps, float x_vel) {
   if (std::abs(x_vel) < 0.01f) {
     return 0.0f;
   }
   float tyre_surface_speed = TYRE_DIAMETER / 2.0f * tyre_rps;
-  return (tyre_surface_speed - x_vel) / x_vel;
+  return std::abs((tyre_surface_speed - x_vel) / x_vel);
 }
 
 static void on_process([[maybe_unused]] void *userdata) {
@@ -82,7 +74,7 @@ static void on_process([[maybe_unused]] void *userdata) {
   d->chunk->stride = stride;
   d->chunk->size = n_frames * stride;
 
-  float slip = std::abs(g_max_slip.load(std::memory_order_relaxed));
+  float slip = g_max_slip.load(std::memory_order_relaxed);
 
   static uint32_t sample_pos = 0;
   static float phase = 0.0f;
@@ -101,7 +93,7 @@ static void on_process([[maybe_unused]] void *userdata) {
     int16_t val = 0;
     if (on) {
       val = (int16_t)(sinf(phase) * 32767.0f * VOLUME);
-      phase += TWO_PI * (float)cli_args.frequency / SAMPLE_RATE;
+      phase += TWO_PI * float(cli_args.frequency) / SAMPLE_RATE;
       if (phase >= TWO_PI) {
         phase -= TWO_PI;
       }
@@ -148,10 +140,10 @@ static void telemetry_loop() {
     ams2_telemetry tele;
     if (read_ams2_telemetry(pid, &tele, remote_addr)) {
       float x_vel = tele.localVelocity[2];
-      float fl = std::abs(compute_slip(tele.tyreRPS[0], x_vel));
-      float fr = std::abs(compute_slip(tele.tyreRPS[1], x_vel));
-      float rl = std::abs(compute_slip(tele.tyreRPS[2], x_vel));
-      float rr = std::abs(compute_slip(tele.tyreRPS[3], x_vel));
+      float fl = compute_slip(tele.tyreRPS[0], x_vel);
+      float fr = compute_slip(tele.tyreRPS[1], x_vel);
+      float rl = compute_slip(tele.tyreRPS[2], x_vel);
+      float rr = compute_slip(tele.tyreRPS[3], x_vel);
       float max_slip = std::max({fl, fr, rl, rr});
       g_max_slip.store(max_slip, std::memory_order_relaxed);
     }
@@ -200,9 +192,6 @@ int main(int argc, char *argv[]) {
       return 1;
     }
   }
-
-  signal(SIGINT, signal_handler);
-  signal(SIGTERM, signal_handler);
 
   pw_init(&argc, &argv);
 

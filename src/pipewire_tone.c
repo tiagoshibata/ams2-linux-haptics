@@ -11,7 +11,7 @@
 
 #define SAMPLE_RATE 48000u
 #define CHANNELS 2u
-#define FREQUENCY 400 // TODO 40
+#define FREQUENCY 40
 #define VOLUME 0.7f
 #define TWO_PI (float)(2 * M_PI)
 
