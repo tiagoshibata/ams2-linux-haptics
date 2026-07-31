@@ -19,14 +19,12 @@
 #define SAMPLE_RATE 48000u
 #define CHANNELS 2u
 #define DEFAULT_FREQUENCY 40
-#define VOLUME 0.7f
+#define VOLUME_LOW 0.4f
+#define VOLUME_HIGH 1.f
 #define TWO_PI (float)(2 * M_PI)
 
-#define SLIP_LOW 0.10f
-#define SLIP_HIGH 0.20f
-
-#define TOGGLE_HZ 5u
-#define SAMPLES_PER_CYCLE (SAMPLE_RATE / TOGGLE_HZ)
+#define SLIP_LOW 0.07f
+#define SLIP_HIGH 0.15f
 
 #define TELEMETRY_POLL_MS 20
 
@@ -76,32 +74,21 @@ static void on_process([[maybe_unused]] void *userdata) {
 
   float slip = g_max_slip.load(std::memory_order_relaxed);
 
-  static uint32_t sample_pos = 0;
   static float phase = 0.0f;
 
-  for (uint32_t i = 0; i < n_frames; ++i) {
-    bool on = false;
-
-    if (slip >= SLIP_HIGH) {
-      on = true;
-    } else if (slip > SLIP_LOW) {
-      float duty = (slip - SLIP_LOW) / (SLIP_HIGH - SLIP_LOW);
-      uint32_t on_samples = (uint32_t)(duty * SAMPLES_PER_CYCLE);
-      on = (sample_pos % SAMPLES_PER_CYCLE) < on_samples;
-    }
-
-    int16_t val = 0;
-    if (on) {
-      val = (int16_t)(sinf(phase) * 32767.0f * VOLUME);
+  if (slip < SLIP_LOW) {
+    memset(dst, 0, n_frames * 2 * sizeof(uint16_t));
+    phase = 0.f;
+  } else {
+    for (uint32_t i = 0; i < n_frames; ++i) {
+      int16_t val = (int16_t)(sinf(phase) * 32767.0f * (slip >= SLIP_HIGH ? VOLUME_HIGH : VOLUME_LOW));
       phase += TWO_PI * float(cli_args.frequency) / SAMPLE_RATE;
       if (phase >= TWO_PI) {
         phase -= TWO_PI;
       }
+      dst[i * CHANNELS] = val;
+      dst[i * CHANNELS + 1] = val;
     }
-
-    dst[i * CHANNELS] = val;
-    dst[i * CHANNELS + 1] = val;
-    sample_pos++;
   }
 
   pw_stream_queue_buffer(stream, b);
@@ -157,14 +144,11 @@ static void print_usage(const char *prog) {
          "  -s, --sink NAME       Target sink node name or serial\n"
          "  -h, --help            Show this help\n"
          "\n"
-         "Plays a tone proportional to wheel slip for haptic feedback.\n"
-         "  < %.0f%% slip: silence\n"
-         "  %.0f%%-%.0f%% slip: toggling at %uHz with proportional duty cycle\n"
-         "  > %.0f%% slip: continuous tone\n"
+         "Plays a tone on wheel slip for haptic feedback.\n"
          "\n"
          "pw-cli can be used to discover sink names and serials. Example:\n"
          "pw-cli list-objects Node | grep -e object.serial -e node.name -e Audio/Sink | grep -B2 'Audio/Sink'",
-         prog, DEFAULT_FREQUENCY, SLIP_LOW * 100, SLIP_LOW * 100, SLIP_HIGH * 100, TOGGLE_HZ, SLIP_HIGH * 100);
+         prog, DEFAULT_FREQUENCY);
 }
 
 int main(int argc, char *argv[]) {
@@ -249,9 +233,6 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "pw_stream_connect failed\n");
     return 1;
   }
-
-  printf("Wheel slip haptics: tone=%dHz, slip thresholds %.0f%%/%.0f%%, toggle=%uHz\n", cli_args.frequency,
-         SLIP_LOW * 100, SLIP_HIGH * 100, TOGGLE_HZ);
 
   std::jthread telemetry_thread(telemetry_loop);
 
